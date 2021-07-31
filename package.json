@@ -1,0 +1,28 @@
+{
+  "name": "lolapi",
+  "version": "1.0.0",
+  "description": "lol stat website using lol api",
+  "scripts": {
+    "dev": "nodemon --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kizarrd/lolapi.git"
+  },
+  "author": "kizarrd",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kizarrd/lolapi/issues"
+  },
+  "homepage": "https://github.com/kizarrd/lolapi#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/node": "^7.14.7",
+    "@babel/preset-env": "^7.14.8",
+    "nodemon": "^2.0.12"
+  }
+}
