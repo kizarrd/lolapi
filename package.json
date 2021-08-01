@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "lol stat website using lol api",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/index.js",
+    "dev": "nodemon --exec babel-node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/kizarrd/lolapi#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
