@@ -6,10 +6,11 @@
 // winRateAgainst: 0,
 // winRatewith: 0
 
-championRecord = [
+championRecordsList = [
     {
         id: 4,
-        encounterList: [
+        numOfGamesPlayed: 431,
+        encounteredChampionsList: [
             {
                 id: 266,
                 played: false,

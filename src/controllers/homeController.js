@@ -9,14 +9,27 @@ class matchInfo {
         this.timestamp = timestamp;
     }
 }
-
 class encounteredChampion {
-    constructor(){
-        
+    constructor(championId){
+        this.id = championId;
+        this.playedAgainst = 0;
+        this.playedWith = 0;
+        this.winAgainst = 0;
+        this.winWith = 0;
+        this.winRateAgainst = 0;
+        this.winRateWith = 0;
+    }
+}
+class championRecord {
+    constructor(championId){
+        this.id = championId;
+        this.numOfGamesPlayed = 1;
+        this.encounteredChampionsList = [];
     }
 }
 
-const API_KEY = "RGAPI-1ee6e8f2-bbe6-4a33-ade9-0e992b4b2d20";
+
+const API_KEY = "RGAPI-609d0a59-692f-4702-bc4c-2f017ff5babc";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const MATCHLISTS_BY_ACCOUNT = "lol/match/v4/matchlists/by-account/";
@@ -38,7 +51,6 @@ const getNumOfTotalGames = async ( encryptedId ) => {
         totalGames
     } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+encryptedId}?endIndex=200&beginIndex=100&api_key=${API_KEY}`)).json();
     console.log("total games: ", totalGames);
-    
     return totalGames;
 }
 
@@ -55,29 +67,85 @@ export const home = async (req, res) => {
         // console.log(list);
         for(var key in list) {
             if([4, 6, 42, 410, 420, 440].includes(list[key].queue)){
-                var instance = new matchInfo(list [key].gameId, list[key].champion, list[key].timestamp);
+                let instance = new matchInfo(list [key].gameId, list[key].champion, list[key].timestamp);
                 matchlist.push(instance);
             }
         }
-        console.log(matchlist.length);
+        console.log("matchlist length: ", matchlist.length);
         beginIndex+=100;
         endIndex+=100;
     }
-    console.log(matchlist);
+    // console.log("matchlist: ", matchlist);
 
     // for each match, update champion record data
 
+    // if (vendors.some(e => e.Name === 'Magenic')) {
+    //     /* vendors contains the element we're looking for */
+    //   }
+
+    // myArray.find(x => x.id === '45').foo;
     let counter = 0;
+
+    let championRecordsList = [];
 
     for(const match of matchlist){
         const matchData = await (await fetch(`${API_ROOT+MATCH_BY_MATCHID+match.matchId}?api_key=${API_KEY}`)).json();
+        // console.log("matchData: ", matchData);
+        let userTeamId = 0;
+        let userWin = true;
+        // find the team id, and win/lose of the player
+        let winTeamId = 0;
+        if(matchData.teams.find(team => team.teamId == 100).win == "Win"){
+            winTeamId = 100;
+        }else if(matchData.teams.find(team => team.teamId == 200).win == "Win"){
+            winTeamId = 200;
+        }
+        for(const participant of matchData.participants){
+            if(participant.championId == match.championId){
+                userTeamId = participant.teamId;
+                userWin = (userTeamId == winTeamId) ? true : false;
+                break;
+            }
+        }
 
-        console.log(matchData);
+        if(!(championRecordsList.some(championRecord => championRecord.id == match.championId))){
+            let instance1 = new championRecord(match.championId);
+            championRecordsList.push(instance1);
+        }else{
+            championRecordsList.find(championRecord => championRecord.id == match.championId).numOfGamesPlayed += 1;
+        }
+        console.log("championRecordsList: ", championRecordsList);
+
+        // update teammates and enemies records
+        for(const participant of matchData.participants){
+            if(participant.championId == match.championId){continue;}
+            if(!(championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.some(encounteredChampion => encounteredChampion.id === participant.championId))){
+                let instance2 = new encounteredChampion(participant.championId); 
+                championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.push(instance2);
+            }
+            if(participant.teamId == userTeamId){
+                championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.find(encounteredChampion => encounteredChampion.id == participant.championId).playedWith += 1;
+                if(userWin){
+                    championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.find(encounteredChampion => encounteredChampion.id == participant.championId).winWith += 1;
+                }
+            }else{
+                championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.find(encounteredChampion => encounteredChampion.id == participant.championId).playedAgainst += 1;
+                if(userWin){
+                    championRecordsList.find(championRecord => championRecord.id == match.championId).encounteredChampionsList.find(encounteredChampion => encounteredChampion.id == participant.championId).winAgainst += 1;
+                }
+            }
+        }
+
+        console.log("championRecordsList: ", championRecordsList);
+
+        // console.log("matchId: ", matchData.gameId, typeof(matchData.gameId));
+        // console.log("userTeamId: ", userTeamId, typeof(userTeamId));
+        // console.log("userWin: ", userWin, typeof(userWin));
 
         counter++;
         if(counter>9) break;
     };
-
+    console.log(championRecordsList.find(championRecord => championRecord.id == 4).encounteredChampionsList);
     res.render("home");
 };
 
