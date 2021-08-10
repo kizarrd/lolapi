@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kizarrd/lolapi#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "mongoose": "^5.13.6",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
     "pug": "^3.0.2"

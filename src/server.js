@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import homeRouter from "./routers/homeRouter";
 import summonerRouter from "./routers/summonerRouter";
+import "./db";
+import "./models/MatchInfo";
 
 const PORT_NUMBER = 3500;
 
