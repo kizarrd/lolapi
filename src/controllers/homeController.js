@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import userMatchLists from "../../userMatchLists";
 import championList from "../../championList";
+import User from "../models/User";
 
 class matchInfo {
     constructor(matchId, championId, timestamp){
@@ -28,8 +29,11 @@ class championRecord {
     }
 }
 
+const encryptedAccountId_SummitRoadId_25th_Aug = "hlYQ1KfOORXo1LaIx_G4IWilxgs9HgINJFNm1YiPE55n47E";
+const puuid_SummitRoadId_25th_Aug = "ZB_ZPxnTnDmv0jSyfno98Ypo3kKR5wPcX0miZw1oM9XVJ2AtoPSz1zDWSU1djJpoG2uEwGvXmaUCtg";
 
-const API_KEY = "RGAPI-609d0a59-692f-4702-bc4c-2f017ff5babc";
+
+const API_KEY = "RGAPI-3353a85e-adf8-4df6-81cc-33f0b30b6092";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const MATCHLISTS_BY_ACCOUNT = "lol/match/v4/matchlists/by-account/";
@@ -40,10 +44,10 @@ const championId = "4";
 
 const getEncryptedSummonerId = async () => {
     const {
-        accountId
+        accountId, puuid
     } = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+SUMMONER_NAME}?api_key=${API_KEY}`)).json();
     console.log(accountId);
-    return accountId;
+    return { accountId, puuid };
 }
 
 const getNumOfTotalGames = async ( encryptedId ) => {
@@ -55,19 +59,19 @@ const getNumOfTotalGames = async ( encryptedId ) => {
 }
 
 export const home = async (req, res) => {
-    const SUMMONER_ID_ENCRYPTED = await getEncryptedSummonerId();
-    const totalGames = await getNumOfTotalGames(SUMMONER_ID_ENCRYPTED);
+    let { accountIdEncrypted, puuid }  = await getEncryptedSummonerId();
+    const totalGames = await getNumOfTotalGames(accountIdEncrypted);
     let forRange = Math.ceil(totalGames/100);
     let matchlist = []; // (array of objects with matchId and championId)
     let beginIndex=0;
     let endIndex=100;
     // fetch all ranked matches played by the user, process those data to save ( gameId(matchId), champion(id), and timestamp )
     for(let i=0; i<forRange; i++) {
-        let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+SUMMONER_ID_ENCRYPTED}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
+        let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountIdEncrypted}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
         // console.log(list);
         for(var key in list) {
             if([4, 6, 42, 410, 420, 440].includes(list[key].queue)){
-                let instance = new matchInfo(list [key].gameId, list[key].champion, list[key].timestamp);
+                let instance = new matchInfo(list[key].gameId, list[key].champion, list[key].timestamp);
                 matchlist.push(instance);
             }
         }
@@ -149,7 +153,7 @@ export const home = async (req, res) => {
     res.render("home");
 };
 
-// const matchlist_by_champion = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+SUMMONER_ID_ENCRYPTED}?champion=${championId}&api_key=${API_KEY}`)).json();
+// const matchlist_by_champion = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountIdEncrypted}?champion=${championId}&api_key=${API_KEY}`)).json();
 
 // const fs = require('fs');
 // const jsonFile = fs.readFileSync('./champion.json', 'utf8');

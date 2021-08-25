@@ -113,7 +113,15 @@ default branch main
 1. get valid API key
 2. get username (by search in real app)
 3. get encrypted account id from username
-    - create and save User model data ( username, encrypted account id, level, avatar info, matchlist array(=> normal js array of objects, and the object contains matchId, championId, and timestamp), championRecords array(=> array of subdocuments/childrenSchemas the subdocument called championRecord will contain championId, numOfTimesPlayed, and encounteredChampionsList(which is again, an array of object, encounteredChampion, which will contain id, playedAgainst, playedWith, winAgainst, winWith, winRateAgainst, and winRateWith ) ) and etc.
+    - create and save User model data ( 
+        username, encrypted account id, level, avatar info, 
+        matchlist array(
+            => normal js array of objects, and the object contains matchId, championId, and timestamp), 
+        championRecords array(
+            => array of subdocuments/childrenSchemas the subdocument called championRecord will contain championId, numOfTimesPlayed, and encounteredChampionsList(
+                which is again, an array of object, encounteredChampion, which will contain id, playedAgainst, playedWith, winAgainst, winWith, winRateAgainst, and winRateWith 
+        ) 
+    ) and etc.
 4. get matchlist data from the encrypted account id
     - save them in the array in the User object
 5. iterate the matchlist, and get match data from the matchId 
