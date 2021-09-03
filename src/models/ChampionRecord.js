@@ -17,7 +17,5 @@ const championRecordSchema = new mongoose.Schema({
     }
 })
 
-export default championRecordSchema;
-
-// const ChampionRecord = mongoose.model("ChampionRecord", championRecordSchema);
-// export default ChampionRecord;
+const ChampionRecord = mongoose.model("ChampionRecord", championRecordSchema);
+export default ChampionRecord;

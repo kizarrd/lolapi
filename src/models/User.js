@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import championRecordSchema from "./ChampionRecord";
 
 // const championRecordSchema = new mongoose.Schema({
 //     championId: Number,
@@ -34,7 +33,7 @@ const userSchema = new mongoose.Schema({
     ],
     championRecords: {
         type: Map,
-        of: championRecordSchema
+        of: { type: mongoose.Schema.Types.ObjectId, ref: "ChampionRecord"}
     }
 })
 

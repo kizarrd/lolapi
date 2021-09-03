@@ -50,7 +50,7 @@ default branch main
         - 단점:
             - 경우에 따라 내 앱의 연산작업이 늘어날 것이다. (어느 정도로?)
 
-# logs - 경험하며 알게된 것들
+# logs
 ### 3rd Aug 2021. TUE
  - the maximum matchlist range allowed for one query is 100
     - e.g. if you played tf for 431 games, then you need to execute 5 queries in total to cover all 431 games. (0-100, 100-200, 200-300, 300-400, 400-432)
@@ -58,6 +58,20 @@ default branch main
         - which means that if startIndex(beginIndex): 0 and endIndex: 100, then it actually shows the list from 0 to 99, excluding the 100. 
         - so if you want a list of 100 matches from 0 to 99, then you need to input 0 for startIndex(beginIndex) and 100 for the endIndex. 
 
+### 3rd Sept 2021. FRI
+ - subdocument써보고 싶었는데 subdocument형식으로 Map type을 연결하는 방법을 알지 못해서 어쩔 수 없이 ChampionRecord Schema를 하나더 만들어서 ObjectId/ref 방법을 이용했다. 
+    - 그래도     
+    championRecords: {
+        type: Map,
+        of: { type: mongoose.Schema.Types.ObjectId, ref: "ChampionRecord"}
+    } 
+    방법을 알아낸 것은 좋았다.
+### 4th Sept 2021. SAT
+ -  winrate with/against 해야함. 
+ -  이후 frontend 기능 구현해야함
+    - 아이디 이름으로 검색 / 버튼으로 data process 실행되도록. 
+ - 라이엇에 샘플 보내서 api 받아야 하고. 그 전에 시간차 api request해서 최대한 내 계정으로 data proess해보자. 도파걸로도 해볼까. 
+ - 샘플 보내려면 publish까지 완료 되어있어야 하는건가? 그럴려면 좀 빡센데 .. 
 
 # algorithm
 1. get username from the user. (search)
