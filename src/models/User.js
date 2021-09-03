@@ -1,20 +1,22 @@
 import mongoose from "mongoose";
+import championRecordSchema from "./ChampionRecord";
 
-const championRecordSchema = new mongoose.Schema({
-    championId: Number,
-    numOfTimesPlayed: Number,
-    encounteredChampionsList: [
-        {
-            id: Number,
-            playedAgainst: Number,
-            playedWith: Number, 
-            winAgainst: Number, 
-            winWith: Number, 
-            winRateAgainst: Number,
-            winRateWith: Number
-        }
-    ]
-})
+// const championRecordSchema = new mongoose.Schema({
+//     championId: Number,
+//     numOfTimesPlayed: Number,
+//     encounteredChampionsList: {
+//         type: Map,
+//         of: {
+//             id: Number,
+//             playedAgainst: Number,
+//             playedWith: Number,
+//             winAgainst: Number,
+//             winWith: Number,
+//             winRateAgainst: Number,
+//             winRateWith: Number
+//         }
+//     }
+// })
 
 const userSchema = new mongoose.Schema({
     userName: String,
@@ -22,6 +24,7 @@ const userSchema = new mongoose.Schema({
     puuid: String,
     level: Number,
     avatarInfo: Number,
+    lastMatchId: String,
     matchList: [
         {
             matchId: Number,
@@ -29,11 +32,16 @@ const userSchema = new mongoose.Schema({
             timestamp: Number
         }
     ],
-    championRecords: [championRecordSchema]
+    championRecords: {
+        type: Map,
+        of: championRecordSchema
+    }
 })
 
 const User = mongoose.model("User", userSchema);
+// const ChampionRecord = mongoose.model("ChampionRecord", championRecordSchema);
 export default User;
+// export { ChampionRecord };
 
 // 3. get encrypted account id from username
 //     - create and save User model data ( 

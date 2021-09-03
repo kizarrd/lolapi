@@ -129,3 +129,18 @@ default branch main
 6. with each match data, create(if there isn't one yet) and update the championRecord objects(and should create and update the encounteredChampion object inside). 
 
 # algorithm ( from db to user(view) )
+
+# concepts learned (새로써본 것들)
+ - JS map? (hash map)
+ - mongoose Map Type
+ - mongoose subdocument
+ - JS .find(x => x.key == value)  method. 
+    - e.g. if(matchData.teams.find(team => team.teamId == 100).win == "Win")
+
+# concepts that i want to learn more 
+1. JS basic syntax and ES6 syntax
+2. promise then / async await
+3. mongoose / mongodb 
+    - when to use Subdocument
+    - how to update subdocument values of a data object
+    - and when to use Schema.Types.ObjectId ( how are the two different? )
