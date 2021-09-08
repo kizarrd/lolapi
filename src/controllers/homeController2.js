@@ -18,7 +18,7 @@ const encryptedAccountId_SummitRoadId_26th_Aug =
 const puuid_SummitRoadId_25th_Aug = "ZB_ZPxnTnDmv0jSyfno98Ypo3kKR5wPcX0miZw1oM9XVJ2AtoPSz1zDWSU1djJpoG2uEwGvXmaUCtg";
 
 
-const API_KEY = "RGAPI-0b65bea2-f1cb-481e-880e-c85e9a9518a0";
+const API_KEY = "RGAPI-2aa939e9-a8cd-4650-b53e-ac1d008e0346";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const MATCHLISTS_BY_ACCOUNT = "lol/match/v4/matchlists/by-account/";
@@ -122,6 +122,21 @@ const processData = async (existingUser) => {
         if(counter>9) break;
         await a_championRecord.save();
     }
+
+    // compute winrates 
+    for(const a_championRecord_objID of existingUser.championRecords.values()){
+        const chmprecord = await ChampionRecord.findById(a_championRecord_objID);
+        for(const an_encounteredChampionData of chmprecord.encounteredChampionsList.values()){
+            if(an_encounteredChampionData.playedWith>0){
+                an_encounteredChampionData.winRateWith = an_encounteredChampionData.winWith / an_encounteredChampionData.playedWith;
+            }
+            if(an_encounteredChampionData.playedAgainst>0){
+                an_encounteredChampionData.winRateAgainst = an_encounteredChampionData.winAgainst / an_encounteredChampionData.playedAgainst;
+            }            
+        }
+        await chmprecord.save();
+    }
+
     await existingUser.save();
 };
 
@@ -133,7 +148,6 @@ export const home = async (req, res) => {
         console.log("this user had been already searched before.");
         console.log(`name of the user: ${existingUser.userName}`);
         console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
-        processData(existingUser);
         return res.render("home");
     }
 
@@ -178,6 +192,7 @@ export const home = async (req, res) => {
         })
         console.log(user);
         await user.save();
+        processData(user);
         return res.render("home");
     } catch(error) {
         console.log(error);

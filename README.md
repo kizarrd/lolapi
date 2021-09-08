@@ -72,6 +72,13 @@ default branch main
     - 아이디 이름으로 검색 / 버튼으로 data process 실행되도록. 
  - 라이엇에 샘플 보내서 api 받아야 하고. 그 전에 시간차 api request해서 최대한 내 계정으로 data proess해보자. 도파걸로도 해볼까. 
  - 샘플 보내려면 publish까지 완료 되어있어야 하는건가? 그럴려면 좀 빡센데 .. 
+ - webpack / publish작업 할때는 git branch 분기해서 작업하도록 하자. 그전에 웹사이트 자체는 거의 끝내놔야 함. 
+### 8th Sept. 2021. WED
+ - processData를 유저 최초 검색시에 실행되도록 위치를 바꿨음. 
+ - winrate 처리 / 저장했음. 
+ - 지금 User가 ChampionRecord를 populate하긴 하는데 ChampionRecord Schema가 User에 연결되어 있다는 사실을 깨달음. 해야하는 이유가 있나? 일단 보류.
+    - 유튭 클론코딩할때는 User와 Video가 서로 연결되어 있었음. (Objectid, ref)
+ - 이제 frontend 해야함. 
 
 # algorithm
 1. get username from the user. (search)
@@ -154,7 +161,8 @@ default branch main
 # concepts that i want to learn more 
 1. JS basic syntax and ES6 syntax
 2. promise then / async await
-3. mongoose / mongodb 
+3. mongoose / mongodb 기본기
+    - fields? documents? types? schema?
     - when to use Subdocument
     - how to update subdocument values of a data object
     - and when to use Schema.Types.ObjectId ( how are the two different? )
