@@ -76,6 +76,7 @@ default branch main
 ### 8th Sept. 2021. WED
  - processData를 유저 최초 검색시에 실행되도록 위치를 바꿨음. 
  - winrate 처리 / 저장했음. 
+    - winrate 처리코드를 함수로 만듬. 다른 코드들도 쪼개서 정리할 필요 있을듯. 가독성이 없어서 며칠만에 봤는데도 무슨 코드인지 파악하는데 한참걸림...
  - 지금 User가 ChampionRecord를 populate하긴 하는데 ChampionRecord Schema가 User에 연결되어 있다는 사실을 깨달음. 해야하는 이유가 있나? 일단 보류.
     - 유튭 클론코딩할때는 User와 Video가 서로 연결되어 있었음. (Objectid, ref)
  - 이제 frontend 해야함. 

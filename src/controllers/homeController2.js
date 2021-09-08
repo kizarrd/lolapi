@@ -48,6 +48,21 @@ const handleSearch = (error, users) => {
     console.log("users", users);
 };
 
+const processWinrate = async(existingUser) => {
+    for(const champRecordId of existingUser.championRecords.values()){
+        const champRecord = await ChampionRecord.findById(champRecordId);
+        for(const encounteredChamp of champRecord.encounteredChampionsList.values()){
+            if(encounteredChamp.playedWith>0){
+                encounteredChamp.winRateWith = encounteredChamp.winWith / encounteredChamp.playedWith;
+            }
+            if(encounteredChamp.playedAgainst>0){
+                encounteredChamp.winRateAgainst = encounteredChamp.winAgainst / encounteredChamp.playedAgainst;
+            }            
+        }
+        await champRecord.save();
+    }
+};
+
 const processData = async (existingUser) => {
     let counter = 0;
     for(const match of existingUser.matchList){
@@ -124,18 +139,7 @@ const processData = async (existingUser) => {
     }
 
     // compute winrates 
-    for(const a_championRecord_objID of existingUser.championRecords.values()){
-        const chmprecord = await ChampionRecord.findById(a_championRecord_objID);
-        for(const an_encounteredChampionData of chmprecord.encounteredChampionsList.values()){
-            if(an_encounteredChampionData.playedWith>0){
-                an_encounteredChampionData.winRateWith = an_encounteredChampionData.winWith / an_encounteredChampionData.playedWith;
-            }
-            if(an_encounteredChampionData.playedAgainst>0){
-                an_encounteredChampionData.winRateAgainst = an_encounteredChampionData.winAgainst / an_encounteredChampionData.playedAgainst;
-            }            
-        }
-        await chmprecord.save();
-    }
+    processWinrate(existingUser);
 
     await existingUser.save();
 };
