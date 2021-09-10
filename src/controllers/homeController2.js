@@ -18,7 +18,7 @@ const encryptedAccountId_SummitRoadId_26th_Aug =
 const puuid_SummitRoadId_25th_Aug = "ZB_ZPxnTnDmv0jSyfno98Ypo3kKR5wPcX0miZw1oM9XVJ2AtoPSz1zDWSU1djJpoG2uEwGvXmaUCtg";
 
 
-const API_KEY = "RGAPI-2aa939e9-a8cd-4650-b53e-ac1d008e0346";
+const API_KEY = "RGAPI-b8fbd444-5a71-4290-9e63-d1565f2ea068";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const MATCHLISTS_BY_ACCOUNT = "lol/match/v4/matchlists/by-account/";
@@ -28,11 +28,22 @@ let SUMMONER_ID_ENCRYPTED = "";
 const championId = "4";
 
 const getSummonerData = async (summonerName) => {
-    const {
-        accountId, puuid, name, summonerLevel, profileIconId
-    } = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+summonerName}?api_key=${API_KEY}`)).json();
-    console.log(accountId);
-    return { accountId, puuid, name, summonerLevel, profileIconId };
+    // const {
+    //     accountId, puuid, name, summonerLevel, profileIconId
+    // } = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+summonerName}?api_key=${API_KEY}`)).json();
+    // console.log(accountId);
+    // return { accountId, puuid, name, summonerLevel, profileIconId };
+    const summonerData = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+summonerName}?api_key=${API_KEY}`)).json();
+
+    if(summonerData.status){
+        return summonerData;
+    }else{
+        const {
+            accountId, puuid, name, summonerLevel, profileIconId
+        } = summonerData;
+        console.log(accountId);
+        return { accountId, puuid, name, summonerLevel, profileIconId };
+    }
 }
 
 const getNumOfTotalGames = async ( encryptedId ) => {
@@ -108,7 +119,7 @@ const processData = async (existingUser) => {
         for(const participant of matchData.participants){
             if(participant.championId == match.championId){continue;}
             if(!a_championRecord.encounteredChampionsList.has(participant.championId.toString())){
-                console.log(`champion ${match.championId} has encountered champion ${participant.championId} for the first time!`);
+                // console.log(`champion ${match.championId} has encountered champion ${participant.championId} for the first time!`);
                 a_championRecord.encounteredChampionsList.set(participant.championId.toString(), {
                     id: participant.championId,
                     playedAgainst: 0,
@@ -118,7 +129,7 @@ const processData = async (existingUser) => {
                     winRateAgainst: 0,
                     winRateWith: 0
                 })
-                console.log("championRecord after the first encounter: ", a_championRecord);
+                // console.log("championRecord after the first encounter: ", a_championRecord);
             }
 
             if(participant.teamId == userTeamId){
@@ -146,61 +157,76 @@ const processData = async (existingUser) => {
 
 export const home = async (req, res) => {
 
-    let userAlreadyExists = await User.exists({userName: SUMMONER_NAME});
-    if(userAlreadyExists){
-        const existingUser = await User.findOne({ userName: SUMMONER_NAME });
-        console.log("this user had been already searched before.");
-        console.log(`name of the user: ${existingUser.userName}`);
-        console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
-        return res.render("home");
-    }
-
-    const { accountId, puuid, name, summonerLevel, profileIconId }  = await getSummonerData(SUMMONER_NAME);
-    console.log("accountIdEncrypted: ", accountId)
-    const totalGames = await getNumOfTotalGames(accountId);
-    let forRange = Math.ceil(totalGames/100);
-    let matchlist = []; // (array of objects with matchId and championId)
-    let beginIndex=0;
-    let endIndex=100;
-    let lastMatchId = '';
-
-
-    // fetch all ranked matches played by the user, process those data to save ( gameId(matchId), champion(id), and timestamp )
-    for(let i=0; i<forRange; i++) {
-        let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
-        // console.log(list);
-        if(i==0){
-            lastMatchId = list[0].gameId.toString()
+    const { username } = req.query;
+    if(username){
+        // check if this is a valid summoner name
+        const summoner = await getSummonerData(username);
+        const { status } = summoner;
+        // if a summoner with the searched name does not exist:
+        if(status){
+            console.log("summoner not found, not a valid name")
+            console.log(status);
+            return res.render("home");
         }
-        for(var j=0; j<list.length; j++) {
-            if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
-                let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
-                matchlist.push(instance);
+        // else if the summoner exists:
+        const { accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+        let userAlreadyExists = await User.exists({userName: name});
+        if(userAlreadyExists){
+            const existingUser = await User.findOne({ userName: name });
+            console.log("this user had been already searched before.");
+            console.log(`name of the user: ${existingUser.userName}`);
+            console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
+            return res.render("home", { summoner });
+        }
+    
+        console.log("accountIdEncrypted: ", accountId)
+        const totalGames = await getNumOfTotalGames(accountId);
+        let forRange = Math.ceil(totalGames/100);
+        let matchlist = []; // (array of objects with matchId and championId)
+        let beginIndex=0;
+        let endIndex=100;
+        let lastMatchId = '';
+    
+        // fetch all ranked matches played by the user, process those data to save ( gameId(matchId), champion(id), and timestamp )
+        for(let i=0; i<forRange; i++) {
+            let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
+            // console.log(list);
+            if(i==0){
+                lastMatchId = list[0].gameId.toString()
             }
+            for(var j=0; j<list.length; j++) {
+                if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
+                    let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
+                    matchlist.push(instance);
+                }
+            }
+            console.log("matchlist length: ", matchlist.length);
+            beginIndex+=100;
+            endIndex+=100;
         }
-        console.log("matchlist length: ", matchlist.length);
-        beginIndex+=100;
-        endIndex+=100;
+    
+        try {
+            const user = new User({
+                userName: name,
+                encryptedAccountId: accountId,
+                puuid,
+                level: summonerLevel,
+                avatarInfo: profileIconId,
+                lastMatchId,
+                matchList: matchlist,
+                championRecords: {}
+            })
+            console.log(user);
+            await user.save();
+            processData(user);
+            return res.render("home", { summoner });
+        } catch(error) {
+            console.log(error);
+            return res.send(`error: ${error}`);
+        }
+    }else{
+        return res.render("home");
     }
 
-    try {
-        const user = new User({
-            userName: name,
-            encryptedAccountId: accountId,
-            puuid,
-            level: summonerLevel,
-            avatarInfo: profileIconId,
-            lastMatchId,
-            matchList: matchlist,
-            championRecords: {}
-        })
-        console.log(user);
-        await user.save();
-        processData(user);
-        return res.render("home");
-    } catch(error) {
-        console.log(error);
-        return res.send(`error: ${error}`);
-    }
     
 };

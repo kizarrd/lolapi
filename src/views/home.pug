@@ -2,5 +2,20 @@ doctype html
 html(lang="ko")
     head 
         title lol stats 
+        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
     body
-        h1 HOME!
+        form(method="GET").search__form
+            input(placeholder="소환사 이름으로 검색" name="username" type="text")
+            button 
+                i.fas.fa-search 
+        div.summoner
+            if summoner
+                span #{summoner.name} is found
+                br
+                span level: #{summoner.summonerLevel}
+                br
+                img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="120" height="120")
+            else
+                span the summoner is not not found
+
+    script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")
