@@ -18,9 +18,10 @@ const encryptedAccountId_SummitRoadId_26th_Aug =
 const puuid_SummitRoadId_25th_Aug = "ZB_ZPxnTnDmv0jSyfno98Ypo3kKR5wPcX0miZw1oM9XVJ2AtoPSz1zDWSU1djJpoG2uEwGvXmaUCtg";
 
 
-const API_KEY = "RGAPI-b8fbd444-5a71-4290-9e63-d1565f2ea068";
+const API_KEY = "RGAPI-c149f653-5ba6-44d0-bb10-d49c36ee3a6e";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
+const RANK_INFO_BY_SUMMONERID = "lol/league/v4/entries/by-summoner/";
 const MATCHLISTS_BY_ACCOUNT = "lol/match/v4/matchlists/by-account/";
 const MATCH_BY_MATCHID = "lol/match/v4/matches/";
 const SUMMONER_NAME = "summit road";
@@ -39,12 +40,24 @@ const getSummonerData = async (summonerName) => {
         return summonerData;
     }else{
         const {
-            accountId, puuid, name, summonerLevel, profileIconId
+            id: summonerId, accountId, puuid, name, summonerLevel, profileIconId
         } = summonerData;
         console.log(accountId);
-        return { accountId, puuid, name, summonerLevel, profileIconId };
+        return { summonerId, accountId, puuid, name, summonerLevel, profileIconId };
     }
-}
+};
+
+const getSummonerRankInfo = async (summonerId) => {
+    const summonerRankDataList = await (await fetch(`${API_ROOT+RANK_INFO_BY_SUMMONERID+summonerId}?api_key=${API_KEY}`)).json();
+    let summonerRankData = 0;
+    for(const summonerRankInfo of summonerRankDataList){
+        if(summonerRankInfo.queueType == "RANKED_SOLO_5x5"){
+            summonerRankData = summonerRankInfo;
+            break;
+        }
+    }
+    return summonerRankData;
+};
 
 const getNumOfTotalGames = async ( encryptedId ) => {
     const {
@@ -169,7 +182,8 @@ export const home = async (req, res) => {
             return res.render("home");
         }
         // else if the summoner exists:
-        const { accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+        const { summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+        const { soloRankTier, soloRankRank, soloRankLeaguePoints, soloRankWins, soloRankLoses } = await getSummonerRankInfo(summonerId);
         let userAlreadyExists = await User.exists({userName: name});
         if(userAlreadyExists){
             const existingUser = await User.findOne({ userName: name });
@@ -208,10 +222,16 @@ export const home = async (req, res) => {
         try {
             const user = new User({
                 userName: name,
+                summonerId,
                 encryptedAccountId: accountId,
                 puuid,
                 level: summonerLevel,
                 avatarInfo: profileIconId,
+                soloRankTier, 
+                soloRankRank, 
+                soloRankLeaguePoints, 
+                soloRankWins, 
+                soloRankLoses,
                 lastMatchId,
                 matchList: matchlist,
                 championRecords: {}

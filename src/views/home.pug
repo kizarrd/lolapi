@@ -15,6 +15,9 @@ html(lang="ko")
                 span level: #{summoner.summonerLevel}
                 br
                 img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="120" height="120")
+                br
+                span tier: #{summoner.soloRankTier}
+                img(src=`tiers/Emblem_${summoner.soloRankTier}`)
             else
                 span the summoner is not not found
 

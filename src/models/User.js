@@ -19,10 +19,16 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
     userName: String,
+    summonerId: String,
     encryptedAccountId: String,
     puuid: String,
     level: Number,
     avatarInfo: Number,
+    soloRankTier: String,
+    soloRankRank: String,
+    soloRankLeaguePoints: Number,
+    soloRankWins: Number,
+    soloRankLoses: Number,
     lastMatchId: String,
     matchList: [
         {
