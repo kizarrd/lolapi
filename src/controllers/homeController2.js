@@ -53,6 +53,7 @@ const getSummonerRankInfo = async (summonerId) => {
     for(const summonerRankInfo of summonerRankDataList){
         if(summonerRankInfo.queueType == "RANKED_SOLO_5x5"){
             summonerRankData = summonerRankInfo;
+            console.log("break!");
             break;
         }
     }
@@ -183,14 +184,26 @@ export const home = async (req, res) => {
         }
         // else if the summoner exists:
         const { summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
-        const { soloRankTier, soloRankRank, soloRankLeaguePoints, soloRankWins, soloRankLoses } = await getSummonerRankInfo(summonerId);
+        const summonerRankInfo = await getSummonerRankInfo(summonerId);
+        const { tier: soloRankTier, rank: soloRankRank, leaguePoints: soloRankLeaguePoints, wins: soloRankWins, losses: soloRankLoses } = summonerRankInfo;
+        console.log("soloRankTier: ", soloRankTier);
+        let soloRankRank_number = 4;
+        if(soloRankRank == 'I'){
+            soloRankRank_number = 1;
+        }else if(soloRankRank_number == 'II'){
+            soloRankRank_number = 2;
+        }else if (soloRankRank_number == 'III'){
+            soloRankRank_number = 3;
+        }else{
+            soloRankRank_number = 4;
+        }
         let userAlreadyExists = await User.exists({userName: name});
         if(userAlreadyExists){
             const existingUser = await User.findOne({ userName: name });
             console.log("this user had been already searched before.");
             console.log(`name of the user: ${existingUser.userName}`);
             console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
-            return res.render("home", { summoner });
+            return res.render("home", { summoner, soloRankTier, soloRankRank_number, soloRankLeaguePoints });
         }
     
         console.log("accountIdEncrypted: ", accountId)
@@ -239,7 +252,7 @@ export const home = async (req, res) => {
             console.log(user);
             await user.save();
             processData(user);
-            return res.render("home", { summoner });
+            return res.render("home", { summoner, soloRankTier, soloRankRank_number, soloRankLeaguePoints });
         } catch(error) {
             console.log(error);
             return res.send(`error: ${error}`);

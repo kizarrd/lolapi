@@ -16,8 +16,11 @@ html(lang="ko")
                 br
                 img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="120" height="120")
                 br
-                span tier: #{summoner.soloRankTier}
-                img(src=`tiers/Emblem_${summoner.soloRankTier}`)
+                span 솔로랭크 #{soloRankTier} #{soloRankRank_number}
+                br
+                span #{soloRankLeaguePoints}LP
+                br
+                img(src=`https://opgg-static.akamaized.net/images/medals/${soloRankTier.toLowerCase()}_${soloRankRank_number}.png` alt="tier emblem" width="120" height="120")
             else
                 span the summoner is not not found
 
