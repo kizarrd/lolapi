@@ -8,20 +8,5 @@ html(lang="ko")
             input(placeholder="소환사 이름으로 검색" name="username" type="text")
             button 
                 i.fas.fa-search 
-        div.summoner
-            if summoner
-                span #{summoner.name} is found
-                br
-                span level: #{summoner.summonerLevel}
-                br
-                img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="120" height="120")
-                br
-                span 솔로랭크 #{soloRankTier} #{soloRankRank_number}
-                br
-                span #{soloRankLeaguePoints}LP
-                br
-                img(src=`https://opgg-static.akamaized.net/images/medals/${soloRankTier.toLowerCase()}_${soloRankRank_number}.png` alt="tier emblem" width="120" height="120")
-            else
-                span the summoner is not not found
 
     script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")

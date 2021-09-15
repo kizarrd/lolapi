@@ -1,0 +1,33 @@
+include mixins/championrecord
+
+doctype html 
+html(lang="ko")
+    head 
+        title lol stats 
+        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+    body       
+        div.summoner
+            if summoner
+                div.summoner__basicInfo
+                    span #{summoner.name}
+                    br
+                    span level: #{summoner.summonerLevel}
+                    br
+                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="120" height="120")
+                    br
+                    span Ranked Solo: #{summonerRankInfo.soloTier} #{summonerRankInfo.soloRank}
+                    br
+                    span #{summonerRankInfo.soloLeaguePoints}LP
+                    br
+                    img(src=`https://opgg-static.akamaized.net/images/medals/${summonerRankInfo.soloTier.toLowerCase()}_${summonerRankInfo.soloRank}.png` alt="tier emblem" width="120" height="120")
+                div.summoner__championRecords
+                    h3 Champions Played by #{summoner.name}
+                    div.summoner__championRecords__table 
+                        each championRecord in Object.fromEntries(champion_records)
+                            +championrecord_format(championRecord)
+                        else 
+                            span.empty-message Champion records not found ❌
+
+
+            else
+                span the summoner is not not found

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const championRecordSchema = new mongoose.Schema({
     championId: Number,
-    numOfTimesPlayed: Number,
+    numOfGamesPlayed: Number,
     encounteredChampionsList: {
         type: Map,
         of: {
