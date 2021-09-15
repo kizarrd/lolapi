@@ -49,7 +49,7 @@ default branch main
             - user의 모든 matchlist를 한번에 요청하기 때문에 api에 user당 한번만 matchlist를 요청하면 된다. 
         - 단점:
             - 경우에 따라 내 앱의 연산작업이 늘어날 것이다. (어느 정도로?)
-
+4. 단순히 key-value 자료형인 해시맵을 쓰기 위해서 Map으로 championRecords와 encounteredChampionsList를 구현한건데 이게 성능적인 이점이 있는건가? 왜 일반 Object쓸 생각을 안했지? 일반 Object와 Map의 탐색(get) time complexity 알아보자. 
 # logs
 ### 3rd Aug 2021. TUE
  - the maximum matchlist range allowed for one query is 100
@@ -80,6 +80,16 @@ default branch main
  - 지금 User가 ChampionRecord를 populate하긴 하는데 ChampionRecord Schema가 User에 연결되어 있다는 사실을 깨달음. 해야하는 이유가 있나? 일단 보류.
     - 유튭 클론코딩할때는 User와 Video가 서로 연결되어 있었음. (Objectid, ref)
  - 이제 frontend 해야함. 
+
+### 15th Sept. 2021. WED
+ - user.populate("championRecords")를 해주어야 render로 view에 user전달할때 championrecord부분이 구현이 됨. 이부분 확실히 이해하게 됨. (schema정의 시에 ref 해놓은 덕분이라는 점)
+ - 소환사데이터 화면에 어떤 데이터를 어떤 식으로 어떤 순서로 보여줄지 계획/대충구현 해봤음. 
+    - op.gg같은거 보면 사용자가 표를 조작하면서 원하는 속성?으로 표 개체들을 재정렬 할 수 있도록 되어 있는데. 나도 그렇게 하는게 좋을듯. 
+    - 검색해보니 html table과 aria? 로 구현할 수 있는듯 하다. html파일 따로 만들어서 연습해본 후 pug로 적용해보자. 
+
+### 16th Sept. 2021. THU
+ - 해야할일 정리해보자.
+ 1. 
 
 # algorithm
 1. get username from the user. (search)
@@ -158,6 +168,11 @@ default branch main
  - mongoose subdocument
  - JS .find(x => x.key == value)  method. 
     - e.g. if(matchData.teams.find(team => team.teamId == 100).win == "Win")
+
+ - 15th Sept
+    - Object.fromEntries(a_Map) 로 Map자료형을 Object로 convert할 수 있다. 
+    - mixin inside a mixin 가능하다. 
+    - 
 
 # concepts that i want to learn more 
 1. JS basic syntax and ES6 syntax
