@@ -1,4 +1,6 @@
 mixin encounteredchampion_format(encounteredChampion)
     div.encounteredChampion
         div.encounteredChampion__data 
-            div #{encounteredChampion.id} #{encounteredChampion.playedAgainst} #{encounteredChampion.playedWith} #{encounteredChampion.winAgainst} #{encounteredChampion.winWith} #{encounteredChampion.winRateAgainst} #{encounteredChampion.winRateWith}
+            div 
+                img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[encounteredChampion.id][0]}.png` alt="champion image" width="32" height="32")
+                span #{championNameById[encounteredChampion.id][1]} #{encounteredChampion.playedAgainst} #{encounteredChampion.playedWith} #{encounteredChampion.winAgainst} #{encounteredChampion.winWith} #{encounteredChampion.winRateAgainst.toFixed(3)*100}% #{encounteredChampion.winRateWith.toFixed(3)*100}%

@@ -5,6 +5,9 @@ import User from "../models/User";
 import ChampionRecord from "../models/ChampionRecord";
 import mongoose from "mongoose";
 import qs from "querystring";
+import championAssets_kr from "../../champion_kr.json";
+import championAssets_us from "../../champion_us.json";
+import { championAssets_pr } from "../../champion_processed";
 
 class matchInfo {
     constructor(matchId, championId, timestamp){
@@ -14,7 +17,7 @@ class matchInfo {
     }
 }
 
-const API_KEY = "RGAPI-944dfee2-30fc-4126-8f0a-e53c1408aac2";
+const API_KEY = "RGAPI-ae4382d5-9efe-41e7-996b-87c50cc4f012";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const RANK_INFO_BY_SUMMONERID = "lol/league/v4/entries/by-summoner/";
@@ -172,11 +175,28 @@ const processData = async (existingUser) => {
         if(counter>9) break;
     }
     // compute winrates 
-    processWinrate(existingUser);
+    await processWinrate(existingUser);
     await existingUser.save();
 };
 
+const getChampionNameById = () => {
+    // const championNameById = {};
+    // for(const value of Object.values(championAssets_kr.data)){
+    //     championNameById[value.key] = [value.id, championAssets_us.data[value.id].name, value.name];
+    // }
+    // console.log(championNameById);
+
+    const championNameById = championAssets_pr;
+    return championNameById;
+};
+
 export const summoner = async (req, res) => {
+
+    const { username2 } = req.query;
+    if(username2){
+        return res.redirect(`/summoners/${username2}`);
+    }
+
     const { username } = req.params;
     if(username){
         console.log(username)
@@ -201,14 +221,7 @@ export const summoner = async (req, res) => {
             console.log(`name of the user: ${existingUser.userName}`);
             console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
             let champion_records = existingUser.championRecords;
-            const championNameById = {
-                4: "Twisted Fate",
-                112: "Viktor",
-                875: "Sett",
-                55: "Katarina",
-                54: "Malphite",
-                268: "Azir"
-            };
+            const championNameById = getChampionNameById();
             return res.render("summoner", { summoner, summonerRankInfo, champion_records, championNameById });
         }
         console.log("accountIdEncrypted: ", accountId);
@@ -254,14 +267,14 @@ export const summoner = async (req, res) => {
             })
             await user.save();
             await processData(user);
-            await user.populate("championRecords");
-            let champion_records = user.championRecords;
-            return res.render("summoner", { summoner, summonerRankInfo, champion_records });
+            const userPopulated =  await User.findOne({ userName: name }).populate("championRecords");
+            let champion_records = userPopulated.championRecords;
+            const championNameById = getChampionNameById();
+            return res.render("summoner", { summoner, summonerRankInfo, champion_records, championNameById });
         } catch(error) {
             console.log(error);
             return res.send(`error: ${error}`);
         }
-    
     }else{
         res.redirect("/");
     }

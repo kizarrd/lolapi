@@ -5,17 +5,22 @@ mixin championrecord_format(championRecord)
         div.championRecord__championPlayed
             div.championPlayed__profile 
                 div.profile__championName
-                    span #{championNameById[championRecord.championId]}
+                    h3 #{championNameById[championRecord.championId][1]}
                 div.profile__championPic
+                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.championId][0]}.png` alt="champion image" width="80" height="80")
                 div.profile__championKDA
                 div.profile__championWinrate
                 div.profile__championNumPlayed
-                    span #{championRecord.numOfGamesPlayed} 판
+                    if championRecord.numOfGamesPlayed > 1
+                        span #{championRecord.numOfGamesPlayed} Games
+                    else
+                        span #{championRecord.numOfGamesPlayed} Game
             div.championPlayed__notableEncounters
                 div.notableEncounters__friend 
                 div.notableEncounters__enemy
         div.profile__encounteredChampionsTable
-            span id playedAgainst playedWith winAgainst winWith winRateAgainst winRateWith
+            h4 champions that <em>#{championNameById[championRecord.championId][1]}</em> had encountered 
+            span champion playedAgainst playedWith winAgainst winWith winRateAgainst winRateWith
             each encounteredChampion in Object.fromEntries(championRecord.encounteredChampionsList)
                 +encounteredchampion_format(encounteredChampion)
             else 

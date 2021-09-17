@@ -87,9 +87,30 @@ default branch main
     - op.gg같은거 보면 사용자가 표를 조작하면서 원하는 속성?으로 표 개체들을 재정렬 할 수 있도록 되어 있는데. 나도 그렇게 하는게 좋을듯. 
     - 검색해보니 html table과 aria? 로 구현할 수 있는듯 하다. html파일 따로 만들어서 연습해본 후 pug로 적용해보자. 
 
-### 16th Sept. 2021. THU
- - 해야할일 정리해보자.
- 1. 
+### 17th Sept. 2021. THU
+ - db에 챔피언은 전부 championId로 저장해 놓았기 때문에 view에서 쓰려면 championId를 가지고 필요한 정보들을 불러와야 한다
+    - 예를들면 챔피언 한글 이름을 불러와서 페이지에 표시해주어야 하고
+    - ddragon url로 챔피언 이미지 등을 가져오려면 영어 이름도 알아야 한다. 
+ - 근데 문제는 이 json은 여러번 요청하는건 비효율인데. 그럼 어떻게 처리해주어야 하지? app시작할때 한번만 request해서 어디 저장해놓는 방식으로 해야하나? 
+ - 그냥 json으로부터 object를 만들어서 물리적인 js파일로 저장해두고 쓰는게 가장 효율적일지도?
+    - 이러면 패치때만 업데이트 해주면 됨. 
+
+ - 일단 로컬에 있는 json파일을 import로 불러오면 object형식으로 자동으로 읽힌다는 것을 알게 되었음.
+    - 괜히 fs.readFile, JSON.parse() 쓴다고 뻘짓했다.
+ - summoner 페이지가 라우터에 요청되면. json을 불러와서 불러온 json내용을 championid(숫자)를 key로, array를 value로 가지는 object로 새롭게 처리해서 render로 넘겨주는 방식을 취함.
+    - 즉 view pug안에서 championId(숫자)로부터 champion이름 등을 불러올 수 있게 처리해 놓은 것. 
+    - array안에는 ddragon asset불러올때 쓰이는 챔피언 이름(asset이름으로 쓰이기 때문에 띄어쓰기 포함), 챔피언 영어이름(띄어쓰기 포함), 챔피언 한글이름, 이 세가지가 있음. 
+    - summoner페이지를 불러올때마다 이 object처리를 해주어야 하는게 비효율이긴 함. O(numOfChampion)의 시간복잡도. 
+        - 한번만 처리해서 이 object를 외부 js파일에 저장해버릴까? 그게 낫겠다.
+
+ - 이제 해야할일 정리해보자.
+ 1. 요청시간 제한 걸어서 소환사의 전체 match 처리할 수 있게. 코드 작성/돌려보기.
+    - 제출할때는 작동이 되는걸 보여주기 위해서 다시 10~50개 match만 처리하도록 바꿔서 제출하자.
+    - 시험삼아 50개정도 해보는데. 이게 50개도 많네. 1분안에 두명 검색하면 요청 제한 초과해버림.
+ 2. front-end: css / js
+ 3. 배포
+ 4. 라이엇에 api승인받기.
+ 5. 최종배포.
 
 # algorithm
 1. get username from the user. (search)
@@ -172,10 +193,12 @@ default branch main
  - 15th Sept
     - Object.fromEntries(a_Map) 로 Map자료형을 Object로 convert할 수 있다. 
     - mixin inside a mixin 가능하다. 
-    - 
+    - Spread syntax (...)
+        - an_array = \[...Map\]
 
 # concepts that i want to learn more 
 1. JS basic syntax and ES6 syntax
+    - Object, Map
 2. promise then / async await
 3. mongoose / mongodb 기본기
     - fields? documents? types? schema?
