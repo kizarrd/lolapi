@@ -1,6 +1,4 @@
 import fetch from "node-fetch";
-import userMatchLists from "../../userMatchLists";
-import championList from "../../championList";
 import User from "../models/User";
 import ChampionRecord from "../models/ChampionRecord";
 import mongoose from "mongoose";
