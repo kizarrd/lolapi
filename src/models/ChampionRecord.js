@@ -14,7 +14,10 @@ const championRecordSchema = new mongoose.Schema({
             winRateAgainst: Number,
             winRateWith: Number
         }
-    }
+    },
+    mostPlayedWith: String, // pug에서 map.get()안에 인자로 활용하기 위해서 String type으로 저장함. championrecord.pug참고
+    mostPlayedAgainst: String,
+    mostEncountered: String
 })
 
 const ChampionRecord = mongoose.model("ChampionRecord", championRecordSchema);

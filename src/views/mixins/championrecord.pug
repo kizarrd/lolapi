@@ -17,12 +17,47 @@ mixin championrecord_format(championRecord)
                         span #{championRecord.numOfGamesPlayed} Game
             div.championPlayed__notableEncounters
                 div.notableEncounters__friend 
+                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image" width="32" height="32")
+                    span With #{championNameById[championRecord.mostPlayedWith][1]} : #{championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).playedWith} Game(s), #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).winRateWith*100).toFixed()}%
                 div.notableEncounters__enemy
+                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedAgainst][0]}.png` alt="champion image" width="32" height="32")
+                    span Against #{championNameById[championRecord.mostPlayedAgainst][1]} : #{championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).playedAgainst} Game(s), #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).winRateAgainst*100).toFixed()}%
         div.profile__encounteredChampionsTable
             h4 champions that <em>#{championNameById[championRecord.championId][1]}</em> had encountered 
-            span champion playedAgainst playedWith winAgainst winWith winRateAgainst winRateWith
-            each encounteredChampion in Object.fromEntries(championRecord.encounteredChampionsList)
-                +encounteredchampion_format(encounteredChampion)
-            else 
-                span.encounteredChampionsTable__empty-message encountered champion not found ❌
-        
+            table 
+                thead
+                    tr
+                        th 
+                            button 
+                                span.field-name champion 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name playedAgainst 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name playedWith 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name winAgainst 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name winWith 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name winRateAgainst 
+                                span.indicator
+                        th 
+                            button 
+                                span.field-name winRateWith
+                                span.indicator
+
+                tbody
+                    each encounteredChampion in Object.fromEntries(championRecord.encounteredChampionsList)
+                        +encounteredchampion_format(encounteredChampion)
+                    else 
+                        span.encounteredChampionsTable__empty-message encountered champion not found ❌

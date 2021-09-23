@@ -15,7 +15,7 @@ class matchInfo {
     }
 }
 
-const API_KEY = "RGAPI-ae4382d5-9efe-41e7-996b-87c50cc4f012";
+const API_KEY = "RGAPI-32d279a3-357c-4b17-b67e-621be4fb03c9";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const RANK_INFO_BY_SUMMONERID = "lol/league/v4/entries/by-summoner/";
@@ -87,7 +87,7 @@ const getNumOfTotalGames = async ( encryptedId ) => {
     console.log("total games: ", totalGames);
     return totalGames;
 };
-const processWinrate = async(existingUser) => {
+const processWinrate = async (existingUser) => {
     for(const champRecordId of existingUser.championRecords.values()){
         const champRecord = await ChampionRecord.findById(champRecordId);
         for(const encounteredChamp of champRecord.encounteredChampionsList.values()){
@@ -98,6 +98,38 @@ const processWinrate = async(existingUser) => {
                 encounteredChamp.winRateAgainst = encounteredChamp.winAgainst / encounteredChamp.playedAgainst;
             }            
         }
+        await champRecord.save();
+    }
+};
+const updateMostEncountered = async (existingUser) => {
+    for(const champRecordId of existingUser.championRecords.values()){
+        const champRecord = await ChampionRecord.findById(champRecordId);
+        let maxPlayedWith = 0;
+        let maxPlayedAgainst = 0;
+        let maxEncountered = 0;
+        let mostWith_id = 0;
+        let mostAgainst_id = 0;
+        let mostEncountered_id = 0;
+        for(const encounteredChamp of champRecord.encounteredChampionsList.values()){
+            const plyd_wth = encounteredChamp.playedWith;
+            const plyd_agnst = encounteredChamp.playedAgainst;
+            const total_encntrd = plyd_wth + plyd_agnst;
+            if(plyd_wth > maxPlayedWith){
+                maxPlayedWith = plyd_wth;
+                mostWith_id = encounteredChamp.id;
+            }
+            if(plyd_agnst > maxPlayedAgainst){
+                maxPlayedAgainst = plyd_agnst;
+                mostAgainst_id = encounteredChamp.id
+            }
+            if(total_encntrd > maxEncountered){
+                maxEncountered = total_encntrd;
+                mostEncountered_id = encounteredChamp.id;
+            }
+        }
+        champRecord.mostPlayedWith = mostWith_id.toString();
+        champRecord.mostPlayedAgainst = mostAgainst_id.toString();
+        champRecord.mostEncountered = mostEncountered_id.toString();
         await champRecord.save();
     }
 };
@@ -174,7 +206,8 @@ const processData = async (existingUser) => {
     }
     // compute winrates 
     await processWinrate(existingUser);
-    await existingUser.save();
+    await updateMostEncountered(existingUser);
+    await existingUser.save(); // 얘를 각 함수 안에 넣는게 낫나??
 };
 
 const getChampionNameById = () => {

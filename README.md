@@ -34,6 +34,7 @@ default branch main
 
 # Questions & Problems
 1. can I res.render an html file? (instead of using pug as view engine)
+    - 당연히 될듯?
 2. when using fetch, summoner name is included in url. the problem is, if the name is in korean, error occurs. 
     - ==> URLs can only be sent over the Internet using the ASCII character-set, so the problem occurs because korean characters are converted into ASCII format.
     - use encodeURI() function?
@@ -48,8 +49,13 @@ default branch main
         - 장점:
             - user의 모든 matchlist를 한번에 요청하기 때문에 api에 user당 한번만 matchlist를 요청하면 된다. 
         - 단점:
-            - 경우에 따라 내 앱의 연산작업이 늘어날 것이다. (어느 정도로?)
+            - 경우에 따라 내 앱(서버)의 연산작업이 늘어날 것이다. (어느 정도로?)
 4. 단순히 key-value 자료형인 해시맵을 쓰기 위해서 Map으로 championRecords와 encounteredChampionsList를 구현한건데 이게 성능적인 이점이 있는건가? 왜 일반 Object쓸 생각을 안했지? 일반 Object와 Map의 탐색(get) time complexity 알아보자. 
+5. 함수는 한개의 동작만 하는 것이 좋다고 주워 들은 적이 있어서 그렇게 하고 있었는데.
+    - processWinrate과 updateMostEncountered함수는 db의 같은 내용을 사용하기 때문에 한번 접근할때 두개를 동시에 처리하는게 성능상으로는 좋을 거 같은데
+    - 오직 가독성 / 유지보수 때문에 따로 관리를 하는 건가? 어떤게 더 나은 코드일까?
+
+
 # logs
 ### 3rd Aug 2021. TUE
  - the maximum matchlist range allowed for one query is 100
@@ -111,6 +117,14 @@ default branch main
  3. 배포
  4. 라이엇에 api승인받기.
  5. 최종배포.
+
+ ### 23rd Sep. 2021, WED
+  - aria는 특수한 목적이 있는 놈이란걸 알게됨. 스크린리더?랑 관련된거라고 함.
+  - 결국 interactive table을 만들기 위해서는 html table태그들과 js(eventlistener)를 이용해야 함. 
+    - https://www.delftstack.com/ko/howto/javascript/javascript-sort-html-table/
+    - 여기 링크에서 기본 소스를 찾음.
+    - 여러개 테이블을 모두 선택하여(querySelect) js를 각기 적용하는데 어려움을 겪었는데(각각의 테이블이 자기들끼리 잘 sort되도록 기능구현을 해야함) forEach방식으로 해결했음. 
+    - 태그들을 array형태로 저장해서 sort비교 시킬 수 있다는 사실을 알게됨. 물론 비교함수(comparer)도 만들어 줘야 하지만
 
 # algorithm
 1. get username from the user. (search)
