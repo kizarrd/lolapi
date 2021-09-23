@@ -119,6 +119,7 @@ default branch main
  5. 최종배포.
 
  ### 23rd Sep. 2021, WED
+  - notable enemies/allies(friends) 기능 구현함. db를 순회하는 식으로 했음.
   - aria는 특수한 목적이 있는 놈이란걸 알게됨. 스크린리더?랑 관련된거라고 함.
   - 결국 interactive table을 만들기 위해서는 html table태그들과 js(eventlistener)를 이용해야 함. 
     - https://www.delftstack.com/ko/howto/javascript/javascript-sort-html-table/
