@@ -20,6 +20,11 @@ html(lang="ko")
                     h3 Ranked Solo: #{summonerRankInfo.soloTier} #{summonerRankInfo.soloRank}
                     img(src=`https://opgg-static.akamaized.net/images/medals/${summonerRankInfo.soloTier.toLowerCase()}_${summonerRankInfo.soloRank}.png` alt="tier emblem" width="120" height="120")
                     span #{summonerRankInfo.soloLeaguePoints}LP
+                div.summoner__update
+                    div.update__lastUpdateTime
+                        span last update: #{user_db.lastUpdateTime}
+                    button.update__button update
+
                 div.summoner__championRecords
                     h2 Champions Played by #{summoner.name}
                     div.summoner__championRecords__table 

@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     soloRankLeaguePoints: Number,
     soloRankWins: Number,
     soloRankLoses: Number,
-    lastMatchId: String,
+    lastUpdateTime: Number,
     matchList: [
         {
             matchId: Number,
