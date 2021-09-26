@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import homeRouter from "./routers/homeRouter";
 import summonerRouter from "./routers/summonerRouter";
+import apiRouter from "./routers/apiRouter";
 import "./db";
 import "./models/MatchInfo";
 
@@ -16,6 +17,7 @@ app.use(morgan('dev'));
 // app.use(express.urlencoded({extended: true}));
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
+app.use("/api", apiRouter);
 
 const handleListen = () => console.log(`Server Listening on port ${PORT_NUMBER} 🚀`);
 

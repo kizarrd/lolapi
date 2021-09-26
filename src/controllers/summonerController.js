@@ -15,7 +15,7 @@ class matchInfo {
     }
 }
 
-const API_KEY = "RGAPI-7bbf799b-a3d7-4dc8-9d35-f60eab956458";
+const API_KEY = "RGAPI-fa376e46-7014-4141-a711-eceb956a7548";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const RANK_INFO_BY_SUMMONERID = "lol/league/v4/entries/by-summoner/";
@@ -236,9 +236,9 @@ export const summoner = async (req, res) => {
     const { username } = req.params;
     const currentDate = new Date();
     const searchedTime = currentDate.getTime();
-    console.log(searchedTime);
+    console.log('epoch searched time: ', searchedTime);
     if(username){
-        console.log(username)
+        console.log('username from req.params (url): ', username);
         // check if this is a valid summoner name
         const summoner = await getSummonerData(username);
         const { status } = summoner;
@@ -335,3 +335,23 @@ export const summoner = async (req, res) => {
         res.redirect("/");
     }
 }
+
+export const update = async (req, res) => {
+    const { username } = req.params;
+    console.log("update controller called, username from params: ", username);
+    console.log("encodeURI: ", encodeURI(username));
+    const currentDate = new Date();
+    const searchedTime = currentDate.getTime();
+
+    if(username){
+        const summoner = await getSummonerData(username);
+        const { status } = summoner;
+        if(status){
+            console.log("summoner not found, not a valid name");
+            console.log(status);
+            return res.redirect("/"); // 이거 재처리 해야 하나? 어떤 페이지로 보낼지.. 아니면 undefined되었다는 summoner object를 summoner와 함께 보낼지.
+        }
+    }else{
+
+    }
+};

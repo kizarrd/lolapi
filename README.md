@@ -38,6 +38,7 @@ default branch main
 2. when using fetch, summoner name is included in url. the problem is, if the name is in korean, error occurs. 
     - ==> URLs can only be sent over the Internet using the ASCII character-set, so the problem occurs because korean characters are converted into ASCII format.
     - use encodeURI() function?
+    - api fetch를 할때 url을 사용하게 되는데 소환사 이름이 한글일 경우 url encode를 한 값을 넣어야 함. 
 3. matchilist data를 api에 요청하는 방식에 대한 고민 - 일단은 2번 방법으로 진행중. 
     1. champion별로 나눠서 하기:
         - 장점: 
@@ -143,6 +144,13 @@ default branch main
         1. 데이터를 숫자로 전달한 다음에 sort를 먼저 처리하고 나서 js로 %를 뒤에 붙여주는 방식을 구현할 수 있다면 해결 할 수 있지 않을까?
         2. sort 알고리즘을 수정해서 %가 있을경우 %를 제외하고 숫자로만 정렬 처리하도록 할 수 있지 않을까?
 
+        - parseInt라는게 있던데 이거 쓰면 편하게 구현할 수 있을지도?
+
+    - 아닌가? 
+        - 3.14159. toFixed(2); // 3.14 returns a string.
+        - parseFloat(3.14159. toFixed(2)); // 3.14 returns a number.
+        - 이런 내용을 봤는데 .toFixed()써서 string취급 되는건가 혹시?
+
  - 사용자가 버튼을 눌러서 전적갱신을 명령할 수 있는 기능을 구현해야 함. 
     - 이유: 앱이 자동으로 검색시마다 갱신하는것보다 사용자가 필요할때만 갱신하도록 하는 것이 서버의 부담이 적음. 
  - 사용자 입장에서 어떻게 작동해야 하는지 생각해보자.
@@ -170,6 +178,9 @@ default branch main
  - 계정은 있지만 기록된 전적이 없는 소환사의 경우 예외처리를 해주어야 할듯. 아마 status object를 return할테니 그걸로 조건 판단하면 될듯. 
 
  - 기능 구현을 머릿속으로만 생각하는게 아니고 적거나 type해서 정리하고 진행하니까 훨씬 이해도 잘되고 효율이 괜찮은거 같다. 실수하거나 무언가 빼먹을 일도 줄고. 
+
+ ### 26th Sep. 2021, SUN
+ - data- 를 활용해서 서버에서 js로 변수 전달이 가능하다?
 
 # algorithm
 1. get username from the user. (search)

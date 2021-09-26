@@ -3,6 +3,14 @@ const getCellValue = (tableRow, columnIndex) => tableRow.children[columnIndex].i
 const comparer = (idx, asc) => (r1, r2) => ((el1, el2) => 
     el1 !== '' && el2 !== '' && !isNaN(el1) && !isNaN(el2) ? el1 - el2 : el1.toString().localeCompare(el2)
     )(getCellValue(asc ? r1 : r2, idx), getCellValue(asc ? r2 : r1, idx));
+    
+document.querySelectorAll('table').forEach(table => {
+    table.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        Array.from(table.querySelector('tbody').querySelectorAll('tr'))
+            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+            .forEach(tr => table.querySelector('tbody').appendChild(tr));
+    })));
+});
 
 // const tbody = document.querySelector('tbody');
 
@@ -24,11 +32,3 @@ const comparer = (idx, asc) => (r1, r2) => ((el1, el2) =>
 //        table.q 
 //     });
 
-
-document.querySelectorAll('table').forEach(table => {
-    table.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-        Array.from(table.querySelector('tbody').querySelectorAll('tr'))
-            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-            .forEach(tr => table.querySelector('tbody').appendChild(tr));
-    })));
-});

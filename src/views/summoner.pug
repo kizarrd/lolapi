@@ -14,7 +14,7 @@ html(lang="ko")
         div.summoner
             if summoner
                 div.summoner__basicInfo
-                    h1 #{summoner.name}
+                    h1#basicInfo__summoner-name(data-username=summoner.name) #{summoner.name}
                     img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="110" height="110")
                     h4 level: #{summoner.summonerLevel}
                     h3 Ranked Solo: #{summonerRankInfo.soloTier} #{summonerRankInfo.soloRank}
@@ -22,8 +22,8 @@ html(lang="ko")
                     span #{summonerRankInfo.soloLeaguePoints}LP
                 div.summoner__update
                     div.update__lastUpdateTime
-                        span last update: #{user_db.lastUpdateTime}
-                    button.update__button update
+                        span#lastUpdateTime__converted=user_db.lastUpdateTime
+                    button#update__button update
 
                 div.summoner__championRecords
                     h2 Champions Played by #{summoner.name}
@@ -35,6 +35,8 @@ html(lang="ko")
             else
                 span the summoner is not not found
 
-    script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")
     script
-        include ../index.js
+        include ../lastUpdateTime.js
+        include ../tableSort.js
+        include ../update.js
+    script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")
