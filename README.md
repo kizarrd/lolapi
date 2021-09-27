@@ -173,6 +173,7 @@ default branch main
     3. 처음으로 검색된 소환사는 자동으로 갱신을 해주도록 하자. 
     4. 마지막으로 갱신한지 일정시간이상 지나지 않았을 경우 갱신할 수 없도록 해야한다. 1분정도면 적절하지 않을까? op.gg는 2분이네
         - 그리고 이게 ajax인건가 갱신 버튼을 누르면 최근전적 부분만 바뀌고 웹사이트 전체가 새로고침 되지는 않음. 
+        - fow의 경우에는 전체 페이지가 새로고침 됨. 난 일단 js locate.reload()로 전체 새로고침하는 방식을 쓰려고 함. 
 
 
  - 계정은 있지만 기록된 전적이 없는 소환사의 경우 예외처리를 해주어야 할듯. 아마 status object를 return할테니 그걸로 조건 판단하면 될듯. 
@@ -180,7 +181,25 @@ default branch main
  - 기능 구현을 머릿속으로만 생각하는게 아니고 적거나 type해서 정리하고 진행하니까 훨씬 이해도 잘되고 효율이 괜찮은거 같다. 실수하거나 무언가 빼먹을 일도 줄고. 
 
  ### 26th Sep. 2021, SUN
- - data- 를 활용해서 서버에서 js로 변수 전달이 가능하다?
+ - dataset를 활용해서 서버에서 js로 변수 전달이 가능하다?
+    - ㅇㅇ. updatebutton event listener만들때 username이 필요해서 이때 활용함. 
+    - lastUpdateTime.js도 수정하자. 괜히 getElementById로 뻘짓했네. 
+ - 이게 전적 분석이 시간이 굉장히 오래걸리네. 열개만 하는데도. 천경기 이상 분석하려면 얼마나 걸리는거야 .. 
+    - api요청/응답 속도가 가장 큰 원인인듯? 왜냐면 summoner처음 검색 시에 matchlist length나 numOfGamesPlayed가 콘솔에 찍히는 속도가 굉장히 느린걸 봤음. 
+    - op.gg같은 서비스는 어떻게 그렇게 빠른거지? production api key는 혹시 더 빠른가??
+
+ ### 27th Sep. 2021, MON
+ - db의 user가 matchlist array를 반드시 가져야 하는지 모르겠음. 
+ - 그냥 local matchlist array를 바로 processData할때 쓰면 되는거 아닌가? 
+    - winrate, championrecords등을 처리하고 나면 matchlist를 가지고 있을 필요는 없는거 같은데??
+    - git 분기해서 진행해볼까. 
+ - 어떤게 더 나은 방법인지 모르겠다. 
+
+ - 마스터, 그마, 챌린저는 티어 이름 뒤에 숫자 표시되지 않도록 해야함.
+ - 업데이트 버튼 클릭시에 summonerinfo, rankinfo등은 항상 업데이트 할 수 있도록 해야함. 
+    - 다만 2분제한은 두고
+ - 하지만 마지막 업데이트 이후 치뤄진 경기가 없다면 경기/championrecords스탯관련 데이터는 업데이트 될 수 없도록 해야함. (processdata말임.)
+ - 데모버전/테스트 위해서 matchlist도 그냥 10~100개 정도만 찾도록 일단 해서 속도 빠르게 해볼 수는 있을듯. 
 
 # algorithm
 1. get username from the user. (search)

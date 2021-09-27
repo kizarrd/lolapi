@@ -17,9 +17,9 @@ html(lang="ko")
                     h1#basicInfo__summoner-name(data-username=summoner.name) #{summoner.name}
                     img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon" width="110" height="110")
                     h4 level: #{summoner.summonerLevel}
-                    h3 Ranked Solo: #{summonerRankInfo.soloTier} #{summonerRankInfo.soloRank}
-                    img(src=`https://opgg-static.akamaized.net/images/medals/${summonerRankInfo.soloTier.toLowerCase()}_${summonerRankInfo.soloRank}.png` alt="tier emblem" width="120" height="120")
-                    span #{summonerRankInfo.soloLeaguePoints}LP
+                    h3 Ranked Solo: #{user_db.soloRankTier} #{user_db.soloRankRank}
+                    img(src=`https://opgg-static.akamaized.net/images/medals/${user_db.soloRankTier.toLowerCase()}_${user_db.soloRankRank}.png` alt="tier emblem" width="120" height="120")
+                    span #{user_db.soloRankLeaguePoints}LP / #{user_db.soloRankWins}승 #{user_db.soloRankLoses}패
                 div.summoner__update
                     div.update__lastUpdateTime
                         span#lastUpdateTime__converted=user_db.lastUpdateTime

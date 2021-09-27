@@ -80,15 +80,20 @@ const getSummonerRankInfo = async (summonerId) => {
     }
     return summonerRankData;
 };
-const getNumOfTotalGames = async ( encryptedId ) => {
-    const {
-        totalGames
-    } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+encryptedId}?endIndex=200&beginIndex=100&api_key=${API_KEY}`)).json();
+const getNumOfTotalGames = async ( encryptedId, beginTime ) => {
+    let total_games = 0;
+    if(beginTime){
+        const { totalGames } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+encryptedId}?beginTime=${beginTime}?endIndex=200&beginIndex=100&api_key=${API_KEY}`)).json();
+        total_games = totalGames;
+    }else{
+        const { totalGames } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+encryptedId}?endIndex=200&beginIndex=100&api_key=${API_KEY}`)).json();
+        total_games = totalGames;
+    }
     // 정확한 이유는 알 수 없으나 beginIndex를 이런식으로 설정하지 않고 그냥 matchlist요청을 하면 totalGames값이 훨씬 적은 값이 나온다. 예를들어서 실제 totalGames는 1700경기 이상이 기록되어 있는데 beginIndex를 default값인 0으로 두고 api요청을 하면 totalGames가 비정상적인 값인 135로 나오는 것. 하지만 위 코드에서 한것처럼 beginIndex를 100이상으로 설정하면 제대로 1700경기가 나옴. 
     // 검색해본 결과 riot api는 현재 시간으로부터 2년전까지의 데이터만 제공하는것으로 알고 있음. 
     // op.gg는 2년 넘은 데이터도 자체적으로 다 저장하고 있는 것일까?
-    console.log("total games: ", totalGames);
-    return totalGames;
+    console.log("total games: ", total_games);
+    return total_games;
 };
 const processWinrate = async (existingUser) => {
     for(const champRecordId of existingUser.championRecords.values()){
@@ -136,9 +141,9 @@ const updateMostEncountered = async (existingUser) => {
         await champRecord.save();
     }
 };
-const processData = async (existingUser) => {
+const processData = async (user_db) => {
     let counter = 0;
-    for(const match of existingUser.matchList){
+    for(const match of user_db.matchList){
         const matchData = await (await fetch(`${API_ROOT+MATCH_BY_MATCHID+match.matchId}?api_key=${API_KEY}`)).json();
         // console.log("matchData: ", matchData);
         let userTeamId = 0;
@@ -157,8 +162,13 @@ const processData = async (existingUser) => {
                 break;
             }
         }
+        // 함수화 할 수 있을듯 getUserTeamIdAndResult(matchData_api);
+
+
+        console.log(`userTeamId: ${userTeamId}, userWin: ${userWin}`);
+
         // if there's no championRecords for the champion played by the user in this match yet, then create one. else, increase the numOfGamesPlayed of the corresponding champion played by the user. 
-        if(!existingUser.championRecords.has(match.championId.toString())){
+        if(!user_db.championRecords.has(match.championId.toString())){
             var stringId = match.championId.toString()
             const a_championRecord = new ChampionRecord({
                 championId: match.championId,
@@ -166,10 +176,10 @@ const processData = async (existingUser) => {
                 encounteredChampionsList: {}
             })
             await a_championRecord.save();
-            existingUser.championRecords.set(stringId, a_championRecord._id);
+            user_db.championRecords.set(stringId, a_championRecord._id);
         }
 
-        const championRecord_objectId = existingUser.championRecords.get(match.championId.toString());
+        const championRecord_objectId = user_db.championRecords.get(match.championId.toString());
         const a_championRecord = await ChampionRecord.findById(championRecord_objectId);
         a_championRecord.numOfGamesPlayed += 1;
         console.log("numOfGamesPlayed", a_championRecord.numOfGamesPlayed);
@@ -208,9 +218,9 @@ const processData = async (existingUser) => {
         if(counter>9) break;
     }
     // compute winrates 
-    await processWinrate(existingUser);
-    await updateMostEncountered(existingUser);
-    await existingUser.save(); // 얘를 각 함수 안에 넣는게 낫나??
+    await processWinrate(user_db);
+    await updateMostEncountered(user_db);
+    await user_db.save(); // 얘를 각 함수 안에 넣는게 낫나??
 };
 
 const getChampionNameById = () => {
@@ -240,7 +250,7 @@ export const summoner = async (req, res) => {
     if(username){
         console.log('username from req.params (url): ', username);
         // check if this is a valid summoner name
-        const summoner = await getSummonerData(username);
+        const summoner = await getSummonerData(username);// getSummonerInfo로 바꿀까
         const { status } = summoner;
         // if a summoner with the searched name does not exist:
         if(status){
@@ -250,22 +260,21 @@ export const summoner = async (req, res) => {
         }
         // else if the summoner exists:
         const { id: summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
-        const summonerRankInfo = await getSummonerRankInfo(summonerId);
-        console.log("soloRankTier: ", summonerRankInfo.soloTier);
 
         // check if user exists in db. 
         // if already exists, get data from db and render it.
         const userAlreadyExists = await User.exists({userName: name});
         if(userAlreadyExists){
-            const existingUser = await User.findOne({ userName: name }).populate("championRecords");
+            const user_db = await User.findOne({ userName: name }).populate("championRecords");
             console.log("this user had been already searched before.");
-            console.log(`name of the user: ${existingUser.userName}`);
+            console.log(`name of the user: ${user_db.userName}`);
             console.log(`encryptedAccountId: ${accountId}`); // useful when looking at matchlist json format from api
-            console.log(`# of matches recorded in db: ${existingUser.matchList.length}`);
-            const champion_records = existingUser.championRecords;
-            const user_db = existingUser;
+            console.log(`# of matches recorded in db: ${user_db.matchList.length}`);
+            console.log("soloRankTier: ", user_db.soloRankTier);
+
+            const champion_records = user_db.championRecords;
             const championNameById = getChampionNameById();
-            return res.render("summoner", { summoner, summonerRankInfo, user_db, champion_records, championNameById }); 
+            return res.render("summoner", { summoner, user_db, champion_records, championNameById }); 
             // 이름들이 좀 헷갈리네. 개선할 수 없을까.
             // summoner와 summonerRankInfo는 api에서 즉석으로 요청하여 얻은 object들이고
             // existingUser와 champion_records는 db에서 나온 녀석들이고(심지어 champion_records는 existingUser.championRecords일 뿐임. 그냥 existingUser만 넘겨서 template에서 existingUser.championRecords이런 식으로 활용해야 하나?)
@@ -285,24 +294,22 @@ export const summoner = async (req, res) => {
         let matchlist = []; // (array of objects with matchId and championId)
         let beginIndex=0;
         let endIndex=100;
-        let lastMatchId = '';
         // fetch all ranked matches played by the user, process those data to save(gameId(matchId), champion(id), and timestamp)
         for(let i=0; i<forRange; i++) {
             let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
-            // console.log(list);
-            if(i==0){
-                lastMatchId = list[0].gameId.toString()
-            }
             for(var j=0; j<list.length; j++) {
                 if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
                     let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
                     matchlist.push(instance);
                 }
             }
+            // console.log("speed check", i);
             console.log("matchlist length: ", matchlist.length);
             beginIndex+=100;
             endIndex+=100;
         }
+        const summonerRankInfo = await getSummonerRankInfo(summonerId);
+        console.log("soloRankTier: ", summonerRankInfo.soloTier);
         try {
             const user = new User({
                 userName: name,
@@ -315,7 +322,7 @@ export const summoner = async (req, res) => {
                 soloRankRank: summonerRankInfo.soloRank, 
                 soloRankLeaguePoints: summonerRankInfo.soloLeaguePoints, 
                 soloRankWins: summonerRankInfo.soloWins, 
-                soloRankLose: summonerRankInfo.soloLosses,
+                soloRankLoses: summonerRankInfo.soloLosses,
                 lastUpdateTime: searchedTime,
                 matchList: matchlist,
                 championRecords: {}
@@ -343,15 +350,129 @@ export const update = async (req, res) => {
     const currentDate = new Date();
     const searchedTime = currentDate.getTime();
 
+    //if username can be found from url req.params
     if(username){
         const summoner = await getSummonerData(username);
         const { status } = summoner;
+        // if invalid summoner name, send error response 404
         if(status){
-            console.log("summoner not found, not a valid name");
-            console.log(status);
-            return res.redirect("/"); // 이거 재처리 해야 하나? 어떤 페이지로 보낼지.. 아니면 undefined되었다는 summoner object를 summoner와 함께 보낼지.
+                console.log("summoner not found, not a valid name");
+                console.log("status obj, riot api: ", status);
+                return res.sendStatus(404);
         }
-    }else{
+        // else if the summoner exists, check if the user is already in our db.
+        // if in db, update
+        // if not in db, it cannot be updated, therefore send error response 404
+        const { id: summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+        const userAlreadyExists = await User.exists({userName: name});
 
+        if(userAlreadyExists){
+            const user_db = await User.findOne({ userName: name }).populate("championRecords");
+            const totalGames = await getNumOfTotalGames(accountId, user_db.lastUpdateTime);
+            let forRange = Math.ceil(totalGames/100);
+            let matchlist = []; // (array of objects with matchId and championId)
+            let beginIndex=0;
+            let endIndex=100;
+
+            for(let i=0; i<forRange; i++) {
+                let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?beginTime=${user_db.lastUpdateTime}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
+                for(var j=0; j<list.length; j++) {
+                    if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
+                        let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
+                        matchlist.push(instance);
+                    }
+                }
+                
+                // console.log("speed check", i);
+                console.log("matchlist length: ", matchlist.length);
+                beginIndex+=100;
+                endIndex+=100;
+            }
+
+            // process data of matches
+
+            let counter = 0;
+            for(const match of matchlist){
+                const matchData = await (await fetch(`${API_ROOT+MATCH_BY_MATCHID+match.matchId}?api_key=${API_KEY}`)).json();
+
+                // 함수화 할 수 있을듯 getUserTeamIdAndResult(matchData_api);
+                let userTeamId = 0;
+                let userWin = true;
+                // find the team id, and win/lose of the player of this match
+                let winTeamId = 0;
+                if(matchData.teams.find(team => team.teamId == 100).win == "Win"){
+                    winTeamId = 100;
+                }else if(matchData.teams.find(team => team.teamId == 200).win == "Win"){
+                    winTeamId = 200;
+                }
+                for(const participant of matchData.participants){
+                    if(participant.championId == match.championId){
+                        userTeamId = participant.teamId;
+                        userWin = (userTeamId == winTeamId) ? true : false;
+                        break;
+                    }
+                }
+
+                console.log(`userTeamId: ${userTeamId}, userWin: ${userWin}`);
+
+                if(!user_db.championRecords.has(match.championId.toString())){
+                    var stringId = match.championId.toString()
+                    const a_championRecord = new ChampionRecord({
+                        championId: match.championId,
+                        numOfGamesPlayed: 0,
+                        encounteredChampionsList: {}
+                    })
+                    await a_championRecord.save();
+                    user_db.championRecords.set(stringId, a_championRecord._id);
+                }
+
+                const championRecord_objectId = user_db.championRecords.get(match.championId.toString());
+                const a_championRecord = await ChampionRecord.findById(championRecord_objectId);
+                a_championRecord.numOfGamesPlayed += 1;
+                console.log("numOfGamesPlayed", a_championRecord.numOfGamesPlayed);
+
+                for(const participant of matchData.participants){
+                    if(participant.championId == match.championId){continue;}
+                    if(!a_championRecord.encounteredChampionsList.has(participant.championId.toString())){
+                        // console.log(`champion ${match.championId} has encountered champion ${participant.championId} for the first time!`);
+                        a_championRecord.encounteredChampionsList.set(participant.championId.toString(), {
+                            id: participant.championId,
+                            playedAgainst: 0,
+                            playedWith: 0,
+                            winAgainst: 0,
+                            winWith: 0,
+                            winRateAgainst: 0,
+                            winRateWith: 0
+                        })
+                        // console.log("championRecord after the first encounter: ", a_championRecord);
+                    }
+        
+                    if(participant.teamId == userTeamId){
+                        a_championRecord.encounteredChampionsList.get(participant.championId.toString()).playedWith += 1;
+                        if(userWin){
+                            a_championRecord.encounteredChampionsList.get(participant.championId.toString()).winWith += 1;
+                        }
+                    }else{
+                        a_championRecord.encounteredChampionsList.get(participant.championId.toString()).playedAgainst += 1;
+                        if(userWin){
+                            a_championRecord.encounteredChampionsList.get(participant.championId.toString()).winAgainst += 1;
+                        }
+                    }
+                }
+                await a_championRecord.save();
+                counter++;
+                if(counter>9) break;
+            }
+            // compute winrates 
+            await processWinrate(user_db);
+            await updateMostEncountered(user_db);
+            await user_db.save(); // 얘를 각 함수 안에 넣는게 낫나??
+        }else{
+            // return res.sendStatus(404);
+        }
+
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(400); 
     }
 };
