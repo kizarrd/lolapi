@@ -1,8 +1,8 @@
 export const home = (req, res) => {
 
-    const { username2 } = req.query;
-    if(username2){
-        return res.redirect(`/summoners/${username2}`);
+    const { username_search } = req.query;
+    if(username_search){
+        return res.redirect(`/summoners/${username_search}`);
     }
     return res.render("home");
 };

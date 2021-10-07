@@ -201,6 +201,13 @@ default branch main
  - 하지만 마지막 업데이트 이후 치뤄진 경기가 없다면 경기/championrecords스탯관련 데이터는 업데이트 될 수 없도록 해야함. (processdata말임.)
  - 데모버전/테스트 위해서 matchlist도 그냥 10~100개 정도만 찾도록 일단 해서 속도 빠르게 해볼 수는 있을듯. 
 
+
+ ### 28th Sep. 2021, TUE
+ - match-v4가 deprecated되어서 9월16일 이후 match data는 검색이 안되는듯.
+ - match-v5에서만 되는 것을 확인했음. 
+    - match-v5에서 2년간의 데이터가 검색이 된다면 아예 match-v5로 코드를 전부 바꿔야 할거같고.
+    - 그렇지 않다면 9월16일 기준으로 이전 데이터는 v4에서. 이후 데이터는v5에서 각각 불러오는 방식을 취해야 할듯. 아이고. 
+
 # algorithm
 1. get username from the user. (search)
 2. get encrypted accountId
@@ -285,9 +292,15 @@ default branch main
     - Spread syntax (...)
         - an_array = \[...Map\]
 
+ - js 함수에는 object와 array등을 통째로 parameter로서 pass over할 수 있다. 
+ - js에서 variable을 declare하고 값을 assign하지 않는다면 undefined를 가진다.
 # concepts that i want to learn more 
 1. JS basic syntax and ES6 syntax
     - Object, Map
+    - js push vs. concat performance
+    - js undefined vs. null
+    - js if false conditions
+        - is null, 0, undefined always false? what elses are falses?
 2. promise then / async await
 3. mongoose / mongodb 기본기
     - fields? documents? types? schema?

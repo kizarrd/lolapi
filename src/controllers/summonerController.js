@@ -15,7 +15,7 @@ class matchInfo {
     }
 }
 
-const API_KEY = "RGAPI-fa376e46-7014-4141-a711-eceb956a7548";
+const API_KEY = "RGAPI-fd48ef31-7e26-4879-a0a6-7fb352971454";
 const API_ROOT = "https://kr.api.riotgames.com/";
 const SUMMONERS_BY_NAME = "lol/summoner/v4/summoners/by-name/";
 const RANK_INFO_BY_SUMMONERID = "lol/league/v4/entries/by-summoner/";
@@ -234,12 +234,15 @@ const getChampionNameById = () => {
     return championNameById;
 };
 
-export const summoner = async (req, res) => {
+export const summonerNoParam = (req, res) => {
+    res.redirect("/");
+};
 
+export const summoner = async (req, res) => {
     // detect search action
-    const { username2 } = req.query;
-    if(username2){
-        return res.redirect(`/summoners/${username2}`);
+    const { username_search } = req.query;
+    if(username_search){
+        return res.redirect(`/summoners/${username_search}`);
     }
 
     // get summoner name from the url params
@@ -247,100 +250,99 @@ export const summoner = async (req, res) => {
     const currentDate = new Date();
     const searchedTime = currentDate.getTime();
     console.log('epoch searched time: ', searchedTime);
-    if(username){
-        console.log('username from req.params (url): ', username);
-        // check if this is a valid summoner name
-        const summoner = await getSummonerData(username);// getSummonerInfo로 바꿀까
-        const { status } = summoner;
-        // if a summoner with the searched name does not exist:
-        if(status){
-            console.log("summoner not found, not a valid name");
-            console.log(status);
-            return res.redirect("/"); // 이거 재처리 해야 하나? 어떤 페이지로 보낼지.. 아니면 undefined되었다는 summoner object를 summoner와 함께 보낼지.
-        }
-        // else if the summoner exists:
-        const { id: summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+    if(!username) return res.redirect("/");
 
-        // check if user exists in db. 
-        // if already exists, get data from db and render it.
-        const userAlreadyExists = await User.exists({userName: name});
-        if(userAlreadyExists){
-            const user_db = await User.findOne({ userName: name }).populate("championRecords");
-            console.log("this user had been already searched before.");
-            console.log(`name of the user: ${user_db.userName}`);
-            console.log(`encryptedAccountId: ${accountId}`); // useful when looking at matchlist json format from api
-            console.log(`# of matches recorded in db: ${user_db.matchList.length}`);
-            console.log("soloRankTier: ", user_db.soloRankTier);
-
-            const champion_records = user_db.championRecords;
-            const championNameById = getChampionNameById();
-            return res.render("summoner", { summoner, user_db, champion_records, championNameById }); 
-            // 이름들이 좀 헷갈리네. 개선할 수 없을까.
-            // summoner와 summonerRankInfo는 api에서 즉석으로 요청하여 얻은 object들이고
-            // existingUser와 champion_records는 db에서 나온 녀석들이고(심지어 champion_records는 existingUser.championRecords일 뿐임. 그냥 existingUser만 넘겨서 template에서 existingUser.championRecords이런 식으로 활용해야 하나?)
-            // 그리고 user가 db에 exist안할때도 template은 똑같기 때문에 같은 variable은 같은 이름으로 넘겨줘야됨.
-            // championNameById는 로컬 파일에서 가져온 object임. 
-
-            // 일단 existingUser대신 user_db로 넘겨보겠음.. 아래에서도 마찬가지.
-            // summoner도 summoner_api이렇게 어디에서 온 녀석인지를 표시하는 이름을 사용하면 좀 코드 이해/유지/관리 가 쉬우려나?
-        }
-        // if this valid summoner does not exist in our db(=if user is searched for the first time), 
-            // get match data of this user, 
-            // process those data, create new db instances(records) with lastUpdateTime, and save it on db, 
-            // and then get the data from the db and render it.  
-        console.log("accountIdEncrypted: ", accountId);
-        const totalGames = await getNumOfTotalGames(accountId);
-        let forRange = Math.ceil(totalGames/100);
-        let matchlist = []; // (array of objects with matchId and championId)
-        let beginIndex=0;
-        let endIndex=100;
-        // fetch all ranked matches played by the user, process those data to save(gameId(matchId), champion(id), and timestamp)
-        for(let i=0; i<forRange; i++) {
-            let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
-            for(var j=0; j<list.length; j++) {
-                if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
-                    let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
-                    matchlist.push(instance);
-                }
-            }
-            // console.log("speed check", i);
-            console.log("matchlist length: ", matchlist.length);
-            beginIndex+=100;
-            endIndex+=100;
-        }
-        const summonerRankInfo = await getSummonerRankInfo(summonerId);
-        console.log("soloRankTier: ", summonerRankInfo.soloTier);
-        try {
-            const user = new User({
-                userName: name,
-                summonerId,
-                encryptedAccountId: accountId,
-                puuid,
-                level: summonerLevel,
-                avatarInfo: profileIconId,
-                soloRankTier: summonerRankInfo.soloTier, 
-                soloRankRank: summonerRankInfo.soloRank, 
-                soloRankLeaguePoints: summonerRankInfo.soloLeaguePoints, 
-                soloRankWins: summonerRankInfo.soloWins, 
-                soloRankLoses: summonerRankInfo.soloLosses,
-                lastUpdateTime: searchedTime,
-                matchList: matchlist,
-                championRecords: {}
-            })
-            await user.save();
-            await processData(user);
-            const userPopulated =  await User.findOne({ userName: name }).populate("championRecords");
-            const user_db = userPopulated;
-            const champion_records = userPopulated.championRecords;
-            const championNameById = getChampionNameById();
-            return res.render("summoner", { summoner, summonerRankInfo, user_db, champion_records, championNameById });
-        } catch(error) {
-            console.log(error);
-            return res.send(`error: ${error}`);
-        }
-    }else{
-        res.redirect("/");
+    console.log('username from req.params (url): ', username);
+    // check if this is a valid summoner name
+    const summoner = await getSummonerData(username);// getSummonerInfo로 바꿀까
+    const { status } = summoner;
+    // if a summoner with the searched name does not exist:
+    if(status){
+        console.log("summoner not found, not a valid name");
+        console.log(status);
+        return res.redirect("/"); // 이거 재처리 해야 하나? 어떤 페이지로 보낼지.. 아니면 undefined되었다는 summoner object를 summoner와 함께 보낼지.
     }
+    // else if the summoner exists:
+    const { id: summonerId , accountId, puuid, name, summonerLevel, profileIconId } = summoner;
+
+    // check if user exists in db. 
+    // if already exists, get data from db and render it.
+    const userAlreadyExists = await User.exists({userName: name});
+    if(userAlreadyExists){
+        const user_db = await User.findOne({ userName: name }).populate("championRecords");
+        console.log("this user had been already searched before.");
+        console.log(`name of the user: ${user_db.userName}`);
+        console.log(`encryptedAccountId: ${accountId}`); // useful when looking at matchlist json format from api
+        console.log(`# of matches recorded in db: ${user_db.matchList.length}`);
+        console.log("soloRankTier: ", user_db.soloRankTier);
+
+        const champion_records = user_db.championRecords;
+        const championNameById = getChampionNameById();
+        return res.render("summoner", { summoner, user_db, champion_records, championNameById }); 
+        // 이름들이 좀 헷갈리네. 개선할 수 없을까.
+        // summoner와 summonerRankInfo는 api에서 즉석으로 요청하여 얻은 object들이고
+        // existingUser와 champion_records는 db에서 나온 녀석들이고(심지어 champion_records는 existingUser.championRecords일 뿐임. 그냥 existingUser만 넘겨서 template에서 existingUser.championRecords이런 식으로 활용해야 하나?)
+        // 그리고 user가 db에 exist안할때도 template은 똑같기 때문에 같은 variable은 같은 이름으로 넘겨줘야됨.
+        // championNameById는 로컬 파일에서 가져온 object임. 
+
+        // 일단 existingUser대신 user_db로 넘겨보겠음.. 아래에서도 마찬가지.
+        // summoner도 summoner_api이렇게 어디에서 온 녀석인지를 표시하는 이름을 사용하면 좀 코드 이해/유지/관리 가 쉬우려나?
+    }
+    // if this valid summoner does not exist in our db(=if user is searched for the first time), 
+        // get match data of this user, 
+        // process those data, create new db instances(records) with lastUpdateTime, and save it on db, 
+        // and then get the data from the db and render it.  
+    console.log("accountIdEncrypted: ", accountId);
+    const totalGames = await getNumOfTotalGames(accountId);
+    let forRange = Math.ceil(totalGames/100);
+    let matchlist = []; // (array of objects with matchId and championId)
+    let beginIndex=0;
+    let endIndex=100;
+    // fetch all ranked matches played by the user, process those data to save(gameId(matchId), champion(id), and timestamp)
+    for(let i=0; i<forRange; i++) {
+        let { matches: list } = await (await fetch(`${API_ROOT+MATCHLISTS_BY_ACCOUNT+accountId}?endIndex=${endIndex}&beginIndex=${beginIndex}&api_key=${API_KEY}`)).json();
+        for(var j=0; j<list.length; j++) {
+            if([4, 6, 42, 410, 420, 440].includes(list[j].queue)){
+                let instance = new matchInfo(list[j].gameId, list[j].champion, list[j].timestamp);
+                matchlist.push(instance);
+            }
+        }
+        // console.log("speed check", i);
+        console.log("matchlist length: ", matchlist.length);
+        beginIndex+=100;
+        endIndex+=100;
+    }
+    const summonerRankInfo = await getSummonerRankInfo(summonerId);
+    console.log("soloRankTier: ", summonerRankInfo.soloTier);
+    try {
+        const user = new User({
+            userName: name,
+            summonerId,
+            encryptedAccountId: accountId,
+            puuid,
+            level: summonerLevel,
+            avatarInfo: profileIconId,
+            soloRankTier: summonerRankInfo.soloTier, 
+            soloRankRank: summonerRankInfo.soloRank, 
+            soloRankLeaguePoints: summonerRankInfo.soloLeaguePoints, 
+            soloRankWins: summonerRankInfo.soloWins, 
+            soloRankLoses: summonerRankInfo.soloLosses,
+            lastUpdateTime: searchedTime,
+            matchList: matchlist,
+            championRecords: {}
+        })
+        await user.save();
+        await processData(user);
+        const userPopulated =  await User.findOne({ userName: name }).populate("championRecords");
+        const user_db = userPopulated;
+        const champion_records = userPopulated.championRecords;
+        const championNameById = getChampionNameById();
+        return res.render("summoner", { summoner, summonerRankInfo, user_db, champion_records, championNameById });
+    } catch(error) {
+        console.log(error);
+        return res.send(`error: ${error}`);
+    }
+    
 }
 
 export const update = async (req, res) => {

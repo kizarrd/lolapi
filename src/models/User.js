@@ -13,14 +13,22 @@ const userSchema = new mongoose.Schema({
     soloRankWins: Number,
     soloRankLoses: Number,
     lastUpdateTime: Number,
-    matchList: [
-        {
-            matchId: Number,
-            championId: Number,
-            timestamp: Number
-        }
-    ],
-    championRecords: {
+    // matchList: [
+    //     {
+    //         matchId: Number,
+    //         championId: Number,
+    //         timestamp: Number
+    //     }
+    // ],
+    championRecordsBefore: {
+        type: Map,
+        of: { type: mongoose.Schema.Types.ObjectId, ref: "ChampionRecord"}
+    },
+    championRecords11: {
+        type: Map,
+        of: { type: mongoose.Schema.Types.ObjectId, ref: "ChampionRecord"}
+    },
+    championRecords12: {
         type: Map,
         of: { type: mongoose.Schema.Types.ObjectId, ref: "ChampionRecord"}
     }
