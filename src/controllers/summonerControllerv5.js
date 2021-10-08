@@ -1,5 +1,5 @@
 import { getSummonerProfile, getSummonerRankInfo, getMatchList, updateChampionRecords } from "./functions";
-import { championAssets_pr } from "../../champion_processed";
+import { championNameById } from "../../champion_processed";
 import User from "../models/User";
 
 export const summonerNoParam = (req, res) => {
@@ -75,6 +75,7 @@ export const summoner2 = async (req, res) => {
     // find the user from our db and pass it over to render method.
     
     const user_db = await User.findOne({ userName: name }).populate("championRecordsBefore").populate("championRecords11");
+    // console.log("ohojokadj: ", user_db[`championRecords${11}`]);
     const champion_records = user_db.championRecords11;
-    return res.render("summonerTestPage", { summoner, user_db, champion_records, championAssets_pr });
+    return res.render("summoner", { summoner, user_db, champion_records, championNameById });
 };

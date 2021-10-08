@@ -12,9 +12,11 @@ mixin championrecord_format(championRecord)
                 div.profile__championWinrate
                 div.profile__championNumPlayed
                     if championRecord.numOfGamesPlayed > 1
-                        span #{championRecord.numOfGamesPlayed} Games
+                        div #{championRecord.numOfGamesPlayed} Games
                     else
-                        span #{championRecord.numOfGamesPlayed} Game
+                        div #{championRecord.numOfGamesPlayed} Game
+                    div #{championRecord.wins}승 #{championRecord.numOfGamesPlayed-championRecord.wins}패
+                    div 승률: #{(championRecord.winRate*100).toFixed()}%
             div.championPlayed__notableEncounters
                 div.notableEncounters__friend 
                     img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image" width="32" height="32")

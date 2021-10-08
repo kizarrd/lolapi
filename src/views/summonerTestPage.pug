@@ -1,3 +1,5 @@
+include mixins/championrecord
+
 doctype html 
 html(lang="ko")
     head 
@@ -23,13 +25,13 @@ html(lang="ko")
                         span#lastUpdateTime__converted=user_db.lastUpdateTime
                     button#update__button update
 
-                //- div.summoner__championRecords
-                //-     h2 Champions Played by #{summoner.name}
-                //-     div.summoner__championRecords__table 
-                //-         each championRecord in Object.fromEntries(champion_records)
-                //-             +championrecord_format(championRecord)
-                //-         else 
-                //-             span.empty-message Champion records not found ❌
+                div.summoner__championRecords
+                    h2 Champions Played by #{summoner.name}
+                    div.summoner__championRecords__table 
+                        each championRecord in Object.fromEntries(champion_records)
+                            +championrecord_format(championRecord)
+                        else 
+                            span.empty-message Champion records not found ❌
             else
                 span the summoner is not not found
 

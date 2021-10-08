@@ -95,7 +95,7 @@ const getNumOfTotalGames = async ( encryptedId, beginTime ) => {
     console.log("total games: ", total_games);
     return total_games;
 };
-const processWinrate = async (existingUser) => {
+const processWinrates = async (existingUser) => {
     for(const champRecordId of existingUser.championRecords.values()){
         const champRecord = await ChampionRecord.findById(champRecordId);
         for(const encounteredChamp of champRecord.encounteredChampionsList.values()){
@@ -218,7 +218,7 @@ const processData = async (user_db) => {
         if(counter>9) break;
     }
     // compute winrates 
-    await processWinrate(user_db);
+    await processWinrates(user_db);
     await updateMostEncountered(user_db);
     await user_db.save(); // 얘를 각 함수 안에 넣는게 낫나??
 };
@@ -466,7 +466,7 @@ export const update = async (req, res) => {
                 if(counter>9) break;
             }
             // compute winrates 
-            await processWinrate(user_db);
+            await processWinrates(user_db);
             await updateMostEncountered(user_db);
             await user_db.save(); // 얘를 각 함수 안에 넣는게 낫나??
         }else{

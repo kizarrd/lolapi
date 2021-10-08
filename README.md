@@ -52,6 +52,10 @@ default branch main
         - 단점:
             - 경우에 따라 내 앱(서버)의 연산작업이 늘어날 것이다. (어느 정도로?)
 4. 단순히 key-value 자료형인 해시맵을 쓰기 위해서 Map으로 championRecords와 encounteredChampionsList를 구현한건데 이게 성능적인 이점이 있는건가? 왜 일반 Object쓸 생각을 안했지? 일반 Object와 Map의 탐색(get) time complexity 알아보자. 
+    - 일반 object의 경우는 각각의 property안에 다른 종류의 값들이 있을것이라고 기대하고 만드는 자료형인 반면
+        - e.g. car object면 modelName, price, color, materials, 뭐 이런 여러가지 property를 가질 수 있겠지
+    - map의 경우에는 같은 자료형의 element를 여러개 보관하고 싶은데 이름을 지어서 보관하고 싶을때 사용하는 느낌인거 같다. 그렇기 때문에 object의 용도와는 다른거 같음. 확실히 map을 쓰는게 의미상으로(semantically) 자연스러운듯? 
+        - e.g. car map이면 "myCar": "yellow", "yourCar": "red" 뭐 이런식으로 같은 종류지만 다른 이름과 내용을 보관할때. 즉 내가 원하는 encounteredChampionsList나 champioinRecords는 맵을 쓰는게 맞다. 근데 성능상 차이는 있는지 궁금하긴 하네.
 5. 함수는 한개의 동작만 하는 것이 좋다고 주워 들은 적이 있어서 그렇게 하고 있었는데.
     - processWinrate과 updateMostEncountered함수는 db의 같은 내용을 사용하기 때문에 한번 접근할때 두개를 동시에 처리하는게 성능상으로는 좋을 거 같은데
     - 오직 가독성 / 유지보수 때문에 따로 관리를 하는 건가? 어떤게 더 나은 코드일까?
@@ -96,13 +100,11 @@ default branch main
  - 지금 User가 ChampionRecord를 populate하긴 하는데 ChampionRecord Schema가 User에 연결되어 있다는 사실을 깨달음. 해야하는 이유가 있나? 일단 보류.
     - 유튭 클론코딩할때는 User와 Video가 서로 연결되어 있었음. (Objectid, ref)
  - 이제 frontend 해야함. 
-
 ### 15th Sept. 2021. WED
  - user.populate("championRecords")를 해주어야 render로 view에 user전달할때 championrecord부분이 구현이 됨. 이부분 확실히 이해하게 됨. (schema정의 시에 ref 해놓은 덕분이라는 점)
  - 소환사데이터 화면에 어떤 데이터를 어떤 식으로 어떤 순서로 보여줄지 계획/대충구현 해봤음. 
     - op.gg같은거 보면 사용자가 표를 조작하면서 원하는 속성?으로 표 개체들을 재정렬 할 수 있도록 되어 있는데. 나도 그렇게 하는게 좋을듯. 
     - 검색해보니 html table과 aria? 로 구현할 수 있는듯 하다. html파일 따로 만들어서 연습해본 후 pug로 적용해보자. 
-
 ### 17th Sept. 2021. THU
  - db에 챔피언은 전부 championId로 저장해 놓았기 때문에 view에서 쓰려면 championId를 가지고 필요한 정보들을 불러와야 한다
     - 예를들면 챔피언 한글 이름을 불러와서 페이지에 표시해주어야 하고
@@ -127,7 +129,6 @@ default branch main
  3. 배포
  4. 라이엇에 api승인받기.
  5. 최종배포.
-
  ### 23rd Sep. 2021, THU
   - notable enemies/allies(friends) 기능 구현함. db를 순회하는 식으로 했음.
   - aria는 특수한 목적이 있는 놈이란걸 알게됨. 스크린리더?랑 관련된거라고 함.
@@ -179,7 +180,6 @@ default branch main
  - 계정은 있지만 기록된 전적이 없는 소환사의 경우 예외처리를 해주어야 할듯. 아마 status object를 return할테니 그걸로 조건 판단하면 될듯. 
 
  - 기능 구현을 머릿속으로만 생각하는게 아니고 적거나 type해서 정리하고 진행하니까 훨씬 이해도 잘되고 효율이 괜찮은거 같다. 실수하거나 무언가 빼먹을 일도 줄고. 
-
  ### 26th Sep. 2021, SUN
  - dataset를 활용해서 서버에서 js로 변수 전달이 가능하다?
     - ㅇㅇ. updatebutton event listener만들때 username이 필요해서 이때 활용함. 
@@ -187,7 +187,6 @@ default branch main
  - 이게 전적 분석이 시간이 굉장히 오래걸리네. 열개만 하는데도. 천경기 이상 분석하려면 얼마나 걸리는거야 .. 
     - api요청/응답 속도가 가장 큰 원인인듯? 왜냐면 summoner처음 검색 시에 matchlist length나 numOfGamesPlayed가 콘솔에 찍히는 속도가 굉장히 느린걸 봤음. 
     - op.gg같은 서비스는 어떻게 그렇게 빠른거지? production api key는 혹시 더 빠른가??
-
  ### 27th Sep. 2021, MON
  - db의 user가 matchlist array를 반드시 가져야 하는지 모르겠음. 
  - 그냥 local matchlist array를 바로 processData할때 쓰면 되는거 아닌가? 
@@ -200,13 +199,16 @@ default branch main
     - 다만 2분제한은 두고
  - 하지만 마지막 업데이트 이후 치뤄진 경기가 없다면 경기/championrecords스탯관련 데이터는 업데이트 될 수 없도록 해야함. (processdata말임.)
  - 데모버전/테스트 위해서 matchlist도 그냥 10~100개 정도만 찾도록 일단 해서 속도 빠르게 해볼 수는 있을듯. 
-
-
  ### 28th Sep. 2021, TUE
  - match-v4가 deprecated되어서 9월16일 이후 match data는 검색이 안되는듯.
  - match-v5에서만 되는 것을 확인했음. 
     - match-v5에서 2년간의 데이터가 검색이 된다면 아예 match-v5로 코드를 전부 바꿔야 할거같고.
     - 그렇지 않다면 9월16일 기준으로 이전 데이터는 v4에서. 이후 데이터는v5에서 각각 불러오는 방식을 취해야 할듯. 아이고. 
+ ### 7th Oct. 2021, THU
+ - 코드 convert?작업을 시작했음. 생각보다는 금방할듯. 
+ ### 8th Oct. 2021, FRI
+ - 신챔프(벡스)에 대한 데이터가 내 앱에 없어서 테스트 중에 에러가 발생하였다(최근 전적에 벡스와 함께 플레이한 적이 있는 플레이어의 전적검색을 테스트 했음)
+ - 이런 신챔프 추가에 대한 업데이트는 어떻게 자동화할 수 있을까? 
 
 # algorithm
 1. get username from the user. (search)
@@ -279,7 +281,7 @@ default branch main
 
 # algorithm ( from db to user(view) )
 
-# concepts learned (새로써본 것들)
+# concepts learned (새로써본 것들, 알게된 것들)
  - JS map? (hash map)
  - mongoose Map Type
  - mongoose subdocument
@@ -294,6 +296,7 @@ default branch main
 
  - js 함수에는 object와 array등을 통째로 parameter로서 pass over할 수 있다. 
  - js에서 variable을 declare하고 값을 assign하지 않는다면 undefined를 가진다.
+ - js object가 const여도 property값은 바꿀 수 있다. 또한 property를 추가하고 제거하는것도 가능하다. 포인터같은 주소할당의 개념인건가? 
 # concepts that i want to learn more 
 1. JS basic syntax and ES6 syntax
     - Object, Map
