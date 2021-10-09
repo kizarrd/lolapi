@@ -1,7 +1,7 @@
 import qs from "querystring";
 import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
-import { championId_by_championName } from "../../champion_processed";
+import { championId_by_championName } from "./champion_processed";
 
 const API_KEY = "RGAPI-d27ad096-9495-4f3d-b7cc-f443b5ccd9fc";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
@@ -184,7 +184,7 @@ const sleep = async (millis) => {
 
 export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
-    const max = 299;
+    const max = 4;
     for(const matchId of matchlist){
         await sleep(1500);
         console.log("processing match #", counter);

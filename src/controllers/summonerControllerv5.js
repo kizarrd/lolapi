@@ -1,5 +1,5 @@
 import { getSummonerProfile, getSummonerRankInfo, getMatchList, updateChampionRecords } from "./functions";
-import { championNameById } from "../../champion_processed";
+import { championNameById } from "./champion_processed";
 import User from "../models/User";
 
 export const summonerNoParam = (req, res) => {

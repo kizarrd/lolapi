@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import qs from "querystring";
 import championAssets_kr from "../../champion_kr.json";
 import championAssets_us from "../../champion_us.json";
-import { championAssets_pr } from "../../champion_processed";
+// import { championAssets_pr } from "../../champion_processed";
 
 class matchInfo {
     constructor(matchId, championId, timestamp){

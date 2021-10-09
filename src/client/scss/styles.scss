@@ -1,0 +1,146 @@
+// Configs
+@import "./config/_reset.scss";
+@import "./config/_variables.scss";
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: $bg;
+    width: 850px;
+    margin: 0 auto;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80px;
+    margin: 20px 0px;
+    justify-content: space-between;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.search__form {
+    input {
+        width: 500px;
+        height: 25px;
+    }
+}
+
+.summoner__basicInfo{
+    background-color: $summonerInfo-color;
+    align-items: center;
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: flex;
+    .basicInfo__profileIconImg {
+        margin-right: 20px;
+        width: 100px;
+        height: 100px;
+        img {
+            width: 100%;
+        }
+    }
+    .basicInfo__others {
+        margin-right: 20px;
+        display: flex;
+        flex-direction: column;
+        .others__nameLevel {
+            display: flex;
+            align-items: center;
+            div {
+                margin-right: 5px;
+            }
+            .summonerName {
+                font-size: 20px;
+                font-weight: bold;
+            }
+            .level {
+                padding: 5px;
+                font-size: 12px;
+                background-color: white;
+                color: $vagueText-color;
+                border-radius: 5px;
+                border: rgb(202, 202, 202) 1px solid;
+                cursor: pointer;
+            }
+        }
+        .others__rankInfo {
+            background-color: white;
+            margin: 5px 0px;
+            padding-right: 10px;
+            border-radius: 5px;
+            border: rgb(202, 202, 202) 1px solid;
+            display: flex;
+            .rankInfo__tierEmblemImg {
+                width: 80px;
+                height: 80px;
+                img {
+                    width: 100%;
+                }
+            }
+            .rankInfo__texts {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                .rankType {
+                    font-size: 12px;
+                    color: $vagueText-color;
+                }
+                .tier {
+                    display: flex;
+                    align-items: center;
+                    margin: 5px 0px;
+                    div{
+                        margin-right: 7px;
+                    }
+                    .tier__tier {
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #ff5252;
+                    }
+                    .tier__lp {
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: black;
+                    }
+                }
+                .winlose {
+                    font-size: 14px;
+                    color: $vagueText-color;
+                }
+            }
+        }
+    }
+    .update {
+        display: flex;
+        flex-direction: column;
+        .updateBtn {
+            margin-bottom: 5px;
+            button {
+                border: none;
+                background-color: #2fc2a0;
+                color: white;
+                border-radius: 5px;
+                font-size: 14px;
+                padding: 12px 15px;
+                cursor: pointer;
+                &:hover {
+                    background-color: #289b80;
+                }
+            }
+        }
+        .update__lastUpdateTime {
+            font-size: 12px;
+            color: $vagueText-color
+        }
+    }
+}

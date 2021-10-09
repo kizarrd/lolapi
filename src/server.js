@@ -5,6 +5,7 @@ import summonerRouter from "./routers/summonerRouter";
 import apiRouter from "./routers/apiRouter";
 import "./db";
 import "./models/MatchInfo";
+import "regenerator-runtime";
 
 const PORT_NUMBER = 3500;
 
@@ -16,7 +17,7 @@ app.set("views", process.cwd()+"/src/views");
 app.use(morgan('dev'));
 // app.use(express.urlencoded({extended: true}));
 
-app.use("/others", express.static("others"));
+app.use("/assets", express.static("assets"));
 
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
