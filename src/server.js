@@ -15,6 +15,9 @@ app.set("views", process.cwd()+"/src/views");
 
 app.use(morgan('dev'));
 // app.use(express.urlencoded({extended: true}));
+
+app.use("/others", express.static("others"));
+
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
 app.use("/api", apiRouter);

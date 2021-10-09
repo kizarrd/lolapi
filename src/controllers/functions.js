@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
 import { championId_by_championName } from "../../champion_processed";
 
-const API_KEY = "RGAPI-854c6deb-0ad2-4c8c-a246-a22ccd8f21bb";
+const API_KEY = "RGAPI-d27ad096-9495-4f3d-b7cc-f443b5ccd9fc";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
 const API_ROOT_ASIA = "https://asia.api.riotgames.com/lol/";
 const MATCH_BY_MATCHID = "match/v5/matches/";
@@ -73,8 +73,11 @@ export const getMatchList = async (puuid, startTime) => {
     const matchlist = [];
     let counter = 0; // 임시 제한
     let startIndex = 0;
+    console.log("startTime: ", startTime);
     while(true){
+        await sleep(1500);
         const matches = await( await fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${API_KEY}`)).json();
+        console.log("matches", matches);
         // [KR_5478478, ... ] 형식의 matchlist array임. 
         if(matches.length == 0)
             break;
@@ -84,10 +87,9 @@ export const getMatchList = async (puuid, startTime) => {
     
         startIndex+=100;
 
-
-        counter++;
-        if(counter > 0)
-            break;
+        // counter++;
+        // if(counter > 0)
+        //     break;
     }
     console.log("matchlist length: ", matchlist.length);
     return matchlist; 
@@ -176,16 +178,32 @@ const updateMostEncountered = async (user_db) => {
     }
 };
 
+const sleep = async (millis) => {
+    return new Promise(resolve => setTimeout(resolve, millis));
+};
+
 export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
-    const max = 7;
+    const max = 299;
     for(const matchId of matchlist){
+        await sleep(1500);
+        console.log("processing match #", counter);
         const matchObject = await (await fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${API_KEY}`)).json();
-        
-        // check if this match is a ranked solo queue. if not, continue.
-        if(![4, 420].includes(matchObject.info.queueId))
+        console.log("api match called, matchId: ", matchId);
+        // if there is an error with the api call, print status and continue to the next match
+        const { status } = matchObject;
+        if(status){
+            console.log("api call error, status: ", status);
+            counter++;
             continue;
-        
+        }
+        // check if this match is a ranked solo queue. if not, continue.
+        if(![4, 420].includes(matchObject.info.queueId)){
+            counter++;
+            continue;
+        }
+        // 자랭의 경우에 counter가 올라가도록 하지 않으면 max보다 많이 api요청이 발생할 수 있음. 미처 생각못했었네. 
+
         // check match start time so that we can determine which championrecords season this match should be classified into.
         // 1610046000 = 한국시간 2021년 1월 8일 오전 4시
         let championRecords_key;
@@ -230,11 +248,11 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         for(const player of playersAtThisMatch){
             // if the player is the user, skip it
             if(player.puuid == user_db.puuid)
-            continue;
+                continue;
             // if the there is no encountered record for this champion in the encounteredChampionsList, create a new encounteredChampion object and add it to the list
             const champId_playedByPlayer = championId_by_championName[player.championName];
             if(!a_championRecord.encounteredChampionsList.has(champId_playedByPlayer.toString())){
-                console.log(`champion ${userChampionName} has encountered champion ${player.championName} for the first time!`);
+                // console.log(`champion ${userChampionName} has encountered champion ${player.championName} for the first time!`);
                 a_championRecord.encounteredChampionsList.set(champId_playedByPlayer.toString(), {
                     id: champId_playedByPlayer,
                     playedAgainst: 0,

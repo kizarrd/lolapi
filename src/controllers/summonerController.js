@@ -350,7 +350,7 @@ export const update = async (req, res) => {
     console.log("update controller called, username from params: ", username);
     console.log("encodeURI: ", encodeURI(username));
     const currentDate = new Date();
-    const searchedTime = currentDate.getTime();
+    const searchedTime = currentDate.getTime(); // 이거 업뎃해야함. 
 
     //if username can be found from url req.params
     if(username){
@@ -358,9 +358,9 @@ export const update = async (req, res) => {
         const { status } = summoner;
         // if invalid summoner name, send error response 404
         if(status){
-                console.log("summoner not found, not a valid name");
-                console.log("status obj, riot api: ", status);
-                return res.sendStatus(404);
+            console.log("summoner not found, not a valid name");
+            console.log("status obj, riot api: ", status);
+            return res.sendStatus(404);
         }
         // else if the summoner exists, check if the user is already in our db.
         // if in db, update
@@ -470,7 +470,7 @@ export const update = async (req, res) => {
             await updateMostEncountered(user_db);
             await user_db.save(); // 얘를 각 함수 안에 넣는게 낫나??
         }else{
-            // return res.sendStatus(404);
+            return res.sendStatus(404);
         }
 
         return res.sendStatus(200);

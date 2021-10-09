@@ -209,6 +209,8 @@ default branch main
  ### 8th Oct. 2021, FRI
  - 신챔프(벡스)에 대한 데이터가 내 앱에 없어서 테스트 중에 에러가 발생하였다(최근 전적에 벡스와 함께 플레이한 적이 있는 플레이어의 전적검색을 테스트 했음)
  - 이런 신챔프 추가에 대한 업데이트는 어떻게 자동화할 수 있을까? 
+ ### 9th Oct. 2021. SAT
+ - 피들스틱이 ddragon에 id: "Fiddlesticks"라고 표기되어 있는데 match api에서는 "FiddleSticks"로(s가 대문자)되어 있기 때문에 에러가 발생했다. 왜이런지는 모르겠다. 현재까지는 다른 챔피언이 이런 경우는 없다. 따라서 내 champion_processed.js의 Fiddlesticks를 FiddleSticks로 바꾸어 주었다. 디스코드에 fiddlesticks로 검색하면 해당 이슈가 다뤄졌던 것을 확인할 수 있다. 
 
 # algorithm
 1. get username from the user. (search)

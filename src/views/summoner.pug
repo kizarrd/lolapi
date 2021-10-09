@@ -4,7 +4,8 @@ doctype html
 html(lang="ko")
     head 
         title lol stats 
-        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        //- link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        link(rel="stylesheet" href="../styles.scss")
     body
         a(href="/") home
         form(method="GET").search__form
@@ -28,8 +29,10 @@ html(lang="ko")
                 div.summoner__championRecords
                     h2 Champions Played by #{summoner.name}
                     div.summoner__championRecords__table 
-                        each championRecord in Object.fromEntries(champion_records)
-                            +championrecord_format(championRecord)
+                        //- each championRecord in Object.fromEntries(user_db.championRecords11)
+                        //-     +championrecord_format(championRecord)
+                        each champPlayed in champion_records_sorted
+                            +championrecord_format(user_db.championRecords11.get(champPlayed[0]))
                         else 
                             span.empty-message Champion records not found ❌
             else
