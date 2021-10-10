@@ -211,7 +211,23 @@ default branch main
  - 이런 신챔프 추가에 대한 업데이트는 어떻게 자동화할 수 있을까? 
  ### 9th Oct. 2021. SAT
  - 피들스틱이 ddragon에 id: "Fiddlesticks"라고 표기되어 있는데 match api에서는 "FiddleSticks"로(s가 대문자)되어 있기 때문에 에러가 발생했다. 왜이런지는 모르겠다. 현재까지는 다른 챔피언이 이런 경우는 없다. 따라서 내 champion_processed.js의 Fiddlesticks를 FiddleSticks로 바꾸어 주었다. 디스코드에 fiddlesticks로 검색하면 해당 이슈가 다뤄졌던 것을 확인할 수 있다. 
+ ### 10th Oct. 2021. SUN
+ - api match called, matchId:  KR_5489084861
+ - api call error, status:  { message: 'Rate limit exceeded', status_code: 429 }
+ - 이런식으로 rate limit exceeded라는 에러가 뜰때가 있다. 계산상으로 2초 대기 후 요청하기 때문에 그럴리가 없는데 랜덤으로 종종 발생하는거 같다. 
+    - 내 추측으로는 그냥 api 전체적으로 많은 요청이 발생했을때(나 뿐만 아니라 다른사람들 포함해서) riot api측에서 이런 제어를 하는게 아닌가 싶다. 
+    - 만약 그렇다면 이렇게 누락된 녀석들의 matchId만 모아놨다가 나중에 다시 요청해서 추가하는 기능을 짤 수 있을듯? 
+    - 뿐만 아니라 다른 error와 status_code가 뭐가 있는지 알아봐야겟다. 아니면 status_code도 함께 저장하도록 코드를 만들어서 직접 확인해보는게 좋을수도 있겠고. 
 
+ - 괴물쥐쥐의 주요 서비스는 소환사 개인의 전체 챔피언별 상대 전적인데 이
+    - (아니면 유명 플레이어의 전적이 궁금한 일반 유저들이 검색할 수도 있겠다. 내가 그런 경우가 많으니) 
+    - 아무튼 뭔가 지속적으로 사람들이 방문할 만한 서비스가 필요하다고 느꼈다. 
+    - 그래서 생각한게 최근 몇경기(10, 50, 100, ...)동안 만난 챔피언들을 정리해서 서비스해 보는건 어떨까 하는 아이디어. 
+        - 메타 챔피언, 혹은 그냥 내 티어, 내가 자주 만나는 챔피언을 알 수 있도록 말이다. 
+        - (내가 플레이한 챔피언과 상관없이 말이다)
+        - 어쩌면 그냥 기존 데이터 가지고 합치는 방식으로 할수도 있을듯?
+
+ - 어떤 동작 중에 서버에 에러나면 에러 화면을 보여주도록 해야함 무한로딩 시키지 말고.
 # algorithm
 1. get username from the user. (search)
 2. get encrypted accountId

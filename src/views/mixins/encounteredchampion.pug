@@ -1,8 +1,8 @@
 mixin encounteredchampion_format(encounteredChampion)
     tr 
         td 
-            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[encounteredChampion.id][0]}.png` alt="champion image" width="32" height="32")
-            span=championNameById[encounteredChampion.id][1]
+            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[encounteredChampion.id][0]}.png`)
+        td.champion=championNameById[encounteredChampion.id][1]
         td=encounteredChampion.playedAgainst
         td=encounteredChampion.playedWith
         td=encounteredChampion.winAgainst

@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
 import { championId_by_championName } from "./champion_processed";
 
-const API_KEY = "RGAPI-d27ad096-9495-4f3d-b7cc-f443b5ccd9fc";
+const API_KEY = "RGAPI-4786ae02-5922-4c8c-b1ee-601c066212ae";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
 const API_ROOT_ASIA = "https://asia.api.riotgames.com/lol/";
 const MATCH_BY_MATCHID = "match/v5/matches/";
@@ -75,7 +75,7 @@ export const getMatchList = async (puuid, startTime) => {
     let startIndex = 0;
     console.log("startTime: ", startTime);
     while(true){
-        await sleep(1500);
+        await sleep(2000);
         const matches = await( await fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${API_KEY}`)).json();
         console.log("matches", matches);
         // [KR_5478478, ... ] 형식의 matchlist array임. 
@@ -87,7 +87,7 @@ export const getMatchList = async (puuid, startTime) => {
     
         startIndex+=100;
 
-        // counter++;
+        counter++;
         // if(counter > 0)
         //     break;
     }
@@ -184,7 +184,7 @@ const sleep = async (millis) => {
 
 export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
-    const max = 4;
+    const max = 19;
     for(const matchId of matchlist){
         await sleep(1500);
         console.log("processing match #", counter);
@@ -285,8 +285,8 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         // await user_db.save();
         // await user_db.save();에 대해 생각을 좀 해봐야 할듯. 퍼포먼스/안정성 차이가 있는지 궁금하고. 어디에 위치시킬건지 얼마나 중복을 제거해야 할지 생각해봐야할듯. match마다 save할 것인지 모든 match끝나고 save할 것인지. 이 함수 밖에서 선언된 녀석이므로 모든 match하고 나서 함수 끝날때 save해도 될듯함? 
         counter++;
-        if(counter>max)
-            break;
+        // if(counter>max)
+        //     break;
     }
     await processWinratesAllSeasons(user_db);
     await updateMostEncountered(user_db);

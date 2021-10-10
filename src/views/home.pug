@@ -2,11 +2,14 @@ doctype html
 html(lang="ko")
     head 
         title lol stats 
-        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+        link(rel="stylesheet" href="/assets/css/styles.css")
     body
-        form(method="GET").search__form
-            input(placeholder="소환사 이름으로 검색" name="username_search" type="text")
-            button 
-                i.fas.fa-search 
-
+        main
+            a(href="/").homelink 괴물.GG
+            form(method="GET").search__form
+                //- input(placeholder="소환사 이름으로 검색" name="username_search" type="text")
+                input(placeholder="Search by summoner name (kr server, e.g. hide on bush)" name="username_search" type="text")
+                button 
+                    i.fas.fa-search 
+    footer
     script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")

@@ -9,6 +9,7 @@ module.exports = {
         lastUpdateTime: BASE_JS + "lastUpdateTime.js",
         tableSort: BASE_JS + "tableSort.js",
         update: BASE_JS + "update.js",
+        foldAndUnfold: BASE_JS + "foldAndUnfold.js"
     },
     mode: "development",
     watch: true,

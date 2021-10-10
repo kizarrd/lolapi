@@ -1,0 +1,112 @@
+.summoner__championRecords {
+    width: 97%;
+    .championRecord {
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }    
+}
+.championRecord__championPlayed {
+    width: 100%;
+    background-color: #7dc8e9;
+    // background-color: #ff8181;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    border-radius: 10px;
+    justify-content: space-between;
+    .championPlayed__profile {
+        display: flex;
+        align-items: center;
+        .profile__championPic {
+            margin-right: 20px;
+            width: 60px;
+            height: 60px;
+            img {
+                border-radius: 50%;
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .profile__texts {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .texts__championName {
+                // padding: 5px;
+                border-radius: 5px;
+                // background-color: #ffb142;
+                font-size: 16px;
+                font-weight: bold;
+                width: fit-content;
+                margin-bottom: 5px;
+            }
+            .texts__numbers {
+                // padding: 5px;
+                border-radius: 5px;
+                // background-color: #f7f1e3;
+                font-size: 12px;
+                .numbers__numOfGamesPlayed {
+                    margin-bottom: 5px;
+                    color: #b33939;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+.championRecord__encounteredChampionsTable {
+    display: none;
+}
+
+.championPlayed__notableEncounters {
+    display: flex;
+    align-items: center;
+    .notableEncounters {
+        margin-right: 5px;
+        // border-radius: 5px;
+        // background-color: $summonerInfo-color;
+        // background-color: #34ace0;
+        // overflow: hidden;
+        .encounters__explain {
+            // background-color: rgb(126, 126, 126);
+            background-color: #227093;
+            background-color: #ff7979;
+            // background-color: #ff5252;
+            font-size: 10px;
+            color: white;
+            padding: 5px 10px 5px 8px;
+            border-radius: 15px;
+            width: fit-content;
+        }
+        .friend {
+            background-color: #34bb9b;
+        }
+        .encounters__champion {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            width: 180px;
+            img {
+                width: 40px;
+                height: 40px;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
+            .champion__texts {
+                .champion__nameAndGames {
+                    display: flex;
+                    font-size: 14px;
+                    font-weight: bold;
+                    .nameAndGames__name {
+                        margin-bottom: 5px;
+                    }
+                }
+                .champion__record {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}

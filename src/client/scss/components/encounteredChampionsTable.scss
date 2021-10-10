@@ -1,0 +1,46 @@
+.championRecord__encounteredChampionsTable {
+    background-color: #a8d4e7;
+    // border-radius: 10px;
+    padding: 0px 15px 15px 15px;
+    // padding: 0px 0px 15px 0px;
+    width: 98%;
+    table {
+        width: 100%;
+    }
+}
+thead {
+    button {
+        border: none;
+        width: 100%;
+        background-color: transparent;
+        text-align: center;
+        padding: 12px 0px;
+        cursor: pointer;
+        &:hover {
+            background-color: #90bfd3;
+        }
+    }
+}
+tbody {
+    img {
+        width: 24px;
+        height: 24px;
+        border-radius: 5px;
+        margin-right: 5px;
+    }
+    tr {
+        height: fit-content;
+        td {
+            vertical-align: middle;
+            text-align: center;
+            font-size: 14px;
+            padding: 2px; 
+        }
+        .champion {
+            text-align: left;
+        }
+        &:nth-child(2n+1){
+            background-color: #84c6e2;
+        }
+    }
+}
