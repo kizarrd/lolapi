@@ -103,7 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-tiers
+# tiers
 
 api_response_examples
 

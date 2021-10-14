@@ -268,9 +268,11 @@ default branch main
  - [ ] 서버, 언어 바꾸는 기능. (언어는 일단은 영어/한국어만 할 수 있겠지. 혹시 문자 달라지면 인코딩도 맞춰서 바꿔야 하려나?)
  - [ ] 업데이트 제한기능 추가해야 함. (2분으로 하자)
  - [ ] 소환사 검색 안될때 그냥 홈으로 돌리지 말고 검색 안된다고 설명 해줘야 할듯. 
+ - [ ] 티어 엠블럼 외부 링크 통해 가져오는게 바람직할듯 한데. 그렇다고 외부 저장소를 이용하는게 맞나? 
  ### 14th Oct. 2021, THU
  - winrate를 서버에서 계산 안해도 되네? 프론트엔드에서 처리하면 되니까. 
  - 기록 17 부분 deploy를 하기 위해 dev용으로 project를 따로 복사해놨다. 
+ - heroku cli 설치된 상황에서  heroku logs --app=monstergg 이런식으로 터미널에서 명령어를 통해 내 앱에 대해 로그를 확인할 수 있다는 것을 알게됨. (heroku git 안쓰고 github connect하더라도 사용 가능)
 
 # algorithm
 1. get username from the user. (search)
