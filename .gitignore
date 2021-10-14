@@ -109,7 +109,7 @@ api_response_examples
 
 champion_kr.json
 champion_us.json
-champion_processed.js
+# champion_processed.js
 
 assets
 
