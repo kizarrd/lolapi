@@ -3,46 +3,49 @@ include encounteredchampion
 mixin championrecord_format(championRecord, idnum)
     div.championRecord
         div.championRecord__championPlayed(id="championPlayed-"+idnum)
-            div.championPlayed__profile 
-                div.profile__championPic
-                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.championId][0]}.png` alt="champion image" width="80" height="80")
-                div.profile__texts
-                    div.texts__championName
-                        h3 #{championNameById[championRecord.championId][1]}
-                    div.texts__numbers
-                        div.numbers__championKDA
-                        //- kda해야 할까? 구현이 어렵지는 않을듯
-                        if championRecord.numOfGamesPlayed > 1
-                            div.numbers__numOfGamesPlayed #{championRecord.numOfGamesPlayed} Games
-                        else
-                            div.numbers__numOfGamesPlayed #{championRecord.numOfGamesPlayed} Game
-                        div.numbers__winlose #{championRecord.wins}승 #{championRecord.numOfGamesPlayed-championRecord.wins}패 (#{(championRecord.winRate*100).toFixed()}%)
-            div.championPlayed__notableEncounters
-                div.notableEncounters#enemy
-                    div.encounters__explain 가장 많이 상대한 챔피언
-                    div.encounters__champion
-                        img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedAgainst][0]}.png` alt="champion image")
-                        div.champion__texts
-                            div.champion__nameAndGames
-                                div.nameAndGames__name #{championNameById[championRecord.mostPlayedAgainst][1]}
-                                div.nameAndGames__games (#{championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).playedAgainst}번)
-                            div.champion__record 승률: #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).winRateAgainst*100).toFixed()}%
-                div.notableEncounters#friend
-                    div.encounters__explain.friend 가장 많이 함께한 챔피언
-                    div.encounters__champion
-                        img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image")
-                        div.champion__texts
-                            div.champion__nameAndGames 
-                                div.nameAndGames__name #{championNameById[championRecord.mostPlayedWith][1]}
-                                div.nameAndGames__games (#{championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).playedWith}번)
-                            div.champion__record 승률: #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).winRateWith*100).toFixed()}%
+            div.championPlayed__contents
+                div.contents__profile 
+                    div.profile__championPic
+                        img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.championId][0]}.png` alt="champion image" width="80" height="80")
+                    div.profile__texts
+                        div.texts__championName
+                            h3 #{championNameById[championRecord.championId][1]}
+                        div.texts__numbers
+                            div.numbers__championKDA
+                            //- kda해야 할까? 구현이 어렵지는 않을듯
+                            if championRecord.numOfGamesPlayed > 1
+                                div.numbers__numOfGamesPlayed #{championRecord.numOfGamesPlayed} Games
+                            else
+                                div.numbers__numOfGamesPlayed #{championRecord.numOfGamesPlayed} Game
+                            div.numbers__winlose #{championRecord.wins}승 #{championRecord.numOfGamesPlayed-championRecord.wins}패 (#{(championRecord.winRate*100).toFixed()}%)
+                div.contents__notableEncounters
+                    div.notableEncounters#enemy
+                        div.encounters__explain 가장 많이 상대한 챔피언
+                        div.encounters__champion
+                            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedAgainst][0]}.png` alt="champion image")
+                            div.champion__texts
+                                div.champion__nameAndGames
+                                    div.nameAndGames__name #{championNameById[championRecord.mostPlayedAgainst][1]}
+                                    div.nameAndGames__games (#{championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).playedAgainst}번)
+                                div.champion__record 승률: #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedAgainst).winRateAgainst*100).toFixed()}%
+                    div.notableEncounters#friend
+                        div.encounters__explain.friend 가장 많이 함께한 챔피언
+                        div.encounters__champion
+                            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image")
+                            div.champion__texts
+                                div.champion__nameAndGames 
+                                    div.nameAndGames__name #{championNameById[championRecord.mostPlayedWith][1]}
+                                    div.nameAndGames__games (#{championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).playedWith}번)
+                                div.champion__record 승률: #{(championRecord.encounteredChampionsList.get(championRecord.mostPlayedWith).winRateWith*100).toFixed()}%
+            div.championPlayed__fold
+                i.fas.fa-caret-down
         div.championRecord__encounteredChampionsTable(id="encounteredChampionsTable-"+idnum)
             //- h4 champions that <em>#{championNameById[championRecord.championId][1]}</em> had encountered 
-            table 
+            table(id="encounteredChampionTable-"+idnum)
                 thead
                     tr
                         th
-                        th 
+                        th
                             button.champion
                                 span.field-name Champion 
                                 span.indicator
@@ -56,11 +59,11 @@ mixin championrecord_format(championRecord, idnum)
                                 span.indicator
                         th 
                             button 
-                                span.field-name Win Against 
+                                span.field-name Wins Against 
                                 span.indicator
                         th 
                             button 
-                                span.field-name Win With 
+                                span.field-name Wins With 
                                 span.indicator
                         th 
                             button 
@@ -68,7 +71,7 @@ mixin championrecord_format(championRecord, idnum)
                                 span.indicator
                         th 
                             button 
-                                span.field-name Winrate With
+                                span.field-name Winrate With 
                                 span.indicator
 
                 tbody

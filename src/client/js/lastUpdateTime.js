@@ -1,10 +1,10 @@
 const time = document.getElementById('lastUpdateTime__converted').innerText;
 const dateObj = new Date()
 const currentEpochTime = dateObj.getTime();
-console.log('time from html', Number(time));
-console.log('currentEpochTime', currentEpochTime);
+// console.log('time from html', Number(time));
+// console.log('currentEpochTime', currentEpochTime);
 const difference = currentEpochTime - Number(time);
-console.log('difference: ', difference);
+// console.log('difference: ', difference);
 
 // const halfSecond = 500;
 const oneSecond = 1000;
