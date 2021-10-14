@@ -6,7 +6,7 @@ mixin championrecord_format(championRecord, idnum)
             div.championPlayed__contents
                 div.contents__profile 
                     div.profile__championPic
-                        img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.championId][0]}.png` alt="champion image" width="80" height="80")
+                        img(src=`${DDRAGON}img/champion/${(championRecord.championId=='9')? 'Fiddlesticks' :championNameById[championRecord.championId][0]}.png` alt="champion image" width="80" height="80")
                     div.profile__texts
                         div.texts__championName
                             h3 #{championNameById[championRecord.championId][1]}
@@ -22,7 +22,7 @@ mixin championrecord_format(championRecord, idnum)
                     div.notableEncounters#enemy
                         div.encounters__explain 가장 많이 상대한 챔피언
                         div.encounters__champion
-                            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedAgainst][0]}.png` alt="champion image")
+                            img(src=`${DDRAGON}img/champion/${(championRecord.mostPlayedAgainst=='9')? 'Fiddlesticks' : championNameById[championRecord.mostPlayedAgainst][0]}.png` alt="champion image")
                             div.champion__texts
                                 div.champion__nameAndGames
                                     div.nameAndGames__name #{championNameById[championRecord.mostPlayedAgainst][1]}
@@ -31,7 +31,7 @@ mixin championrecord_format(championRecord, idnum)
                     div.notableEncounters#friend
                         div.encounters__explain.friend 가장 많이 함께한 챔피언
                         div.encounters__champion
-                            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image")
+                            img(src=`${DDRAGON}img/champion/${(championRecord.mostPlayedWith=='9')? 'Fiddlesticks' : championNameById[championRecord.mostPlayedWith][0]}.png` alt="champion image")
                             div.champion__texts
                                 div.champion__nameAndGames 
                                     div.nameAndGames__name #{championNameById[championRecord.mostPlayedWith][1]}

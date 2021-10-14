@@ -1,11 +1,11 @@
 mixin encounteredchampion_format(encounteredChampion)
     tr 
         td 
-            img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/champion/${championNameById[encounteredChampion.id][0]}.png`)
+            img(src=`${DDRAGON}img/champion/${(encounteredChampion.id=='9')? 'Fiddlesticks' : championNameById[encounteredChampion.id][0]}.png`)
         td.champion=championNameById[encounteredChampion.id][1]
         td=encounteredChampion.playedAgainst
         td=encounteredChampion.playedWith
-        td=encounteredChampion.winAgainst
-        td=encounteredChampion.winWith
-        td #{(encounteredChampion.winRateAgainst*100).toFixed()}%
-        td #{(encounteredChampion.winRateWith*100).toFixed()}%
+        td #{(encounteredChampion.playedAgainst == 0)? 'x' : encounteredChampion.winAgainst}
+        td #{(encounteredChampion.playedWith == 0)? 'x' : encounteredChampion.winWith}
+        td #{(encounteredChampion.playedAgainst == 0)? 'x' : `${(encounteredChampion.winRateAgainst*100).toFixed()}%`}
+        td #{(encounteredChampion.playedWith == 0)? 'x' : `${(encounteredChampion.winRateWith*100).toFixed()}%`}

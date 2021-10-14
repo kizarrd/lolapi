@@ -8,12 +8,9 @@ module.exports = {
         main: BASE_JS + "main.js",
         lastUpdateTime: BASE_JS + "lastUpdateTime.js",
         tableSort: BASE_JS + "tableSort.js",
-        tableSort2: BASE_JS + "tableSort2.js",
         update: BASE_JS + "update.js",
         foldAndUnfold: BASE_JS + "foldAndUnfold.js"
     },
-    mode: "development",
-    watch: true,
     plugins: [
         new MiniCssExtractPlugin({
             filename: "css/styles.css",

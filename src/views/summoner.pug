@@ -3,7 +3,7 @@ include mixins/championrecord
 doctype html 
 html(lang="ko")
     head 
-        title lol stats 
+        title monstergg 
         link(rel="stylesheet" href="/assets/css/styles.css")
     body
         header
@@ -16,14 +16,15 @@ html(lang="ko")
         if summoner
             div.summoner__basicInfo
                 div.basicInfo__profileIconImg
-                    img(src=`http://ddragon.leagueoflegends.com/cdn/11.18.1/img/profileicon/${summoner.profileIconId}.png` alt="profile icon")
+                    img(src=`${DDRAGON}img/profileicon/${summoner.profileIconId}.png` alt="profile icon")
                 div.basicInfo__others
                     div.others__nameLevel
                         div.summonerName#basicInfo__summoner-name(data-username=summoner.name) #{summoner.name}
                         div.level level: #{summoner.summonerLevel}
                     div.others__rankInfo
                         div.rankInfo__tierEmblemImg 
-                            img(src=`https://opgg-static.akamaized.net/images/medals/${user_db.soloRankTier.toLowerCase()}_${user_db.soloRankRank}.png` alt="tier emblem")
+                            //- img(src=`https://opgg-static.akamaized.net/images/medals/${user_db.soloRankTier.toLowerCase()}_${user_db.soloRankRank}.png` alt="tier emblem")
+                            img(src=`/tiers/Emblem_${user_db.soloRankTier}.png` alt="tier emblem")
                         div.rankInfo__texts
                             div.rankType Ranked Solo 
                             div.tier 
@@ -48,7 +49,6 @@ html(lang="ko")
     script(src="/assets/js/main.js")
     script(src="/assets/js/lastUpdateTime.js")
     script(src="/assets/js/tableSort.js")
-    //- script(src="/assets/js/tableSort2.js")
     script(src="/assets/js/update.js")
     script(src="/assets/js/foldAndUnfold.js")
     script(src="https://kit.fontawesome.com/9f340f31fc.js" crossorigin="anonymous")

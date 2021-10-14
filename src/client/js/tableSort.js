@@ -1,8 +1,13 @@
 const getCellValue = (tableRow, columnIndex) => {
+    const daInnerText = tableRow.children[columnIndex].innerText;
+    const th_asc = tableRow.parentNode.parentNode.querySelector('thead').querySelector('tr').children[columnIndex].asc;
+    if(daInnerText=='x'){
+        return th_asc ? -1 : Infinity;
+    }
     if(columnIndex >= 6){
-        return parseInt(tableRow.children[columnIndex].innerText);
+        return parseInt(daInnerText);
     }else{
-        return tableRow.children[columnIndex].innerText;
+        return daInnerText;
     }
     // return tableRow.children[columnIndex].innerText || tableRow.children[columnIndex].textContent;
 }

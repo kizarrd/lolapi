@@ -7,8 +7,6 @@ import "./db";
 import "./models/MatchInfo";
 import "regenerator-runtime";
 
-const PORT_NUMBER = 3500;
-
 const app = express();
 
 app.set("view engine", "pug");
@@ -18,12 +16,11 @@ app.use(morgan('dev'));
 // app.use(express.urlencoded({extended: true}));
 
 app.use("/assets", express.static("assets"));
+app.use("/tiers", express.static("tiers"));
 
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
 app.use("/api", apiRouter);
 
-const handleListen = () => console.log(`Server Listening on port ${PORT_NUMBER} 🚀`);
-
-app.listen(PORT_NUMBER, handleListen);
+export default app;
 

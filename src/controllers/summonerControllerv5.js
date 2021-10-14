@@ -2,11 +2,14 @@ import { getSummonerProfile, getSummonerRankInfo, getMatchList, updateChampionRe
 import { championNameById } from "./champion_processed";
 import User from "../models/User";
 
+const PATCH_VERSION = "11.20.1";
+const DDRAGON = `http://ddragon.leagueoflegends.com/cdn/${PATCH_VERSION}/`;
+
 export const summonerNoParam = (req, res) => {
     res.redirect("/");
 };
 
-export const summoner2 = async (req, res) => {
+export const summoner = async (req, res) => {
     // if another name searched, redirect with the name searched
     const { username_search } = req.query;
     if(username_search) 
@@ -82,13 +85,13 @@ export const summoner2 = async (req, res) => {
     champion_records_sorted.sort((a, b) =>{
         return b[1] - a[1];
     })
-    return res.render("summoner", { summoner, user_db, champion_records_sorted, championNameById });
+    return res.render("summoner", { summoner, user_db, champion_records_sorted, championNameById, DDRAGON });
 };
 
-export const update2 = async (req, res) => {
+export const update = async (req, res) => {
     const { username } = req.params;
     console.log("update controller called, username from params: ", username);
-    console.log("encodeURI: ", encodeURI(username));
+    // console.log("encodeURI: ", encodeURI(username));
 
     // if something's wrong with the username(maybe not found), then return error statuscode 400
     if(!username)

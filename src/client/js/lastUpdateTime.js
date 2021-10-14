@@ -27,13 +27,11 @@ window.addEventListener('load', (event) => {
         const timeWithUnit = (months > 1) ? months.toString()+' months' : months.toString()+' month';
         document.getElementById('lastUpdateTime__converted').innerText = generateLastUpdateText(timeWithUnit);
     }else if(difference >= oneDay){
-        console.log('day executed');
         let days = Math.round(difference/oneDay);
         // days = (difference%oneDay > halfDay) ? days+1 : days;
         const timeWithUnit = (days > 1) ? days.toString()+' days' : days.toString()+' day';
         document.getElementById('lastUpdateTime__converted').innerText = generateLastUpdateText(timeWithUnit);
     }else if(difference >= oneHour){
-        console.log('executed');
         let hours = Math.round(difference/oneHour);
         // hours = (difference%oneHour > halfHour) ? hours+1 : hours;
         const timeWithUnit = (hours > 1) ? hours.toString()+' hours' : hours.toString()+' hour';

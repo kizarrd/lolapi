@@ -233,11 +233,12 @@ default branch main
  - 할거/고민 정리
  - [x] 처음 summoner화면이 로딩 되면 encountered champions table이 디폴트로 most played against순으로 정렬되게 하고 싶음. 
  - [x] 50% 100% 정렬 버그 수정
- - [ ] 지연시간 주석처리 해놓고 loop max지정하기 getmatchlist는 한번, updatechampionrecords는 5번정도? 
+ - [x] 지연시간 주석처리 해놓고 loop max지정하기 getmatchlist는 한번, updatechampionrecords는 5번정도? 
  - [ ] 마지막 갱신시간 표시할때 서버에서 epoch time을 받아온 후 브라우저 js에서 다시 일반 시간형식으로 바꾸는 방법을 쓰고 있는데 이게 시간이 좀 걸리다 보니 epoch time이 그대로 노출됨. 이것도 수정하면 좋을듯.
- - [ ] 이렇게 했을때 한사람당 대충 얼마나 걸리는지 확인해보기
+ - [x] 이렇게 했을때 한사람당 대충 얼마나 걸리는지 확인해보기
     - 로딩할때 로딩화면 보여주는 등의 해결책을 생각해봐야할지 판단
     - 소환사 데이터 처리중에 또다시 검색되었을 경우 현재 에러가 발생하는데 이거 어떻게 처리할지도 판단
+    - [ ] 이것도 production key받고 나서 다시 판단할 수 있을듯. 
  - [x] 접기 펼치기 화살표 만들어서 좀더 직관적인 디자인 만들기. 아마 fontawesome에서 가져올 수 있지 않을까 대충 삼각형 모양으로
  - [ ] 서버 에러 발생했을때 페이지 처리
  - [ ] encounteredChampionsTable에 총 만난 횟수(played against + played with)추가할지 고민
@@ -246,15 +247,30 @@ default branch main
     - 당장 11월에 시즌 11끝남. 근데 그렇다고 시즌 12가 당장 시작하는건 아닌데 이 기간의 기록은 어떻게 분류해야 하는거지
         - 걍 여전히 시즌 11로 분류해야 맞지 않을까 싶은디
     - 아마 전시즌 통합으로 볼 수 있게도 하면 좋겠지?
- - [ ] 티어 엠블럼 op.gg에서 가져오고 있는데 혹시 문제될 수 있으니 소스 바꿔야 할듯. 
- - [ ] 피들스틱이랑 벡스 이미지 깨짐. 그리고 소환사 프로필 아이콘도 이미지 깨지는것들 있더라. 
+ - [x] 티어 엠블럼 op.gg에서 가져오고 있는데 혹시 문제될 수 있으니 소스 바꿔야 할듯. 
+    - 일단 티어 이미지를 다운 받아서 express static이용해서 스태틱 폴더로 만들어서 사용하는 중. 아마 storage에 저장하면 링크로 가져올 수 있을듯.
+ - [x] 벡스 이미지 깨짐. 그리고 소환사 프로필 아이콘도 이미지 깨지는것들 있더라. 
+    - 이건 패치 버전 문제임.(ddragon링크 11.18.1 => 11.20.1) 이것도 자동화 할 수 있는 방법이 있을거 같다.
+ - [x] 피들스틱 이미지 깨짐. 이건 패치버전과 무관하게 champion name이슈. 위에 자세하게 적어둠.
+    - pug에서 피들스틱인 경우 예외처리 함.
  - [ ] 배포(deploy)
     - 배포하기 전에 기능에 대해 좀더 안내 가이드? 같은것을 사이트 내에 표시해야 하는지 생각해 봐야겠음.
  - [ ] 라이엇에 production key요청
+    - [ ] 프로덕션 키 받고 나면 처리시간 얼마나 걸리는지 확인하고 만약 여전히 오래걸린다면 로딩 방식/화면 고민좀 해봐야 겠음. 예를들어 일단 소환사프로필만 먼저 띄워주고 chapmionrecords는 로딩완료되면 그때 띄워준다던가. 
  - [ ] winrate을 서버/db에서 계산/저장하지 않고 프론트엔드 js에서 할지 고민.
     - 유의미한 시간차이 / 서버 계산처리량 차이 / db저장용량 차이 가 있을까??
+ - [x] 함께 플레이한 적이 없을때는 승률/wins X표시 시켜야됨. 
+    - 이거 때문에 sort함수도 수정했음. 정확히는 getCellValue 함수를 수정함. 왜냐하면 x표시된 녀석들은 해당사항이 없는 녀석들(N/A)이기 때문에 sort order가 ascending이던 descending이던 항상 맨 아래에 오도록 해야되는데 그러기 위해서 descending인 경우에는 -1을 주고 ascending인 경우에는 infinity를 줘서 항상 맨 아래로 가도록 함. 
+    - 이 과정에 parentNode, children등등 새로 알게된 html dom property등을 활용할 수 있어서 좋았음. 
+ - [ ] 이제 안쓰는 파일들 정리. controllers
+ - [ ] champion_processed.js 파일 위치?
+ - [ ] 언랭일때 소환사 프로필 처리 해야함. e.g. 지이0l잉
+ - [ ] 서버, 언어 바꾸는 기능. (언어는 일단은 영어/한국어만 할 수 있겠지. 혹시 문자 달라지면 인코딩도 맞춰서 바꿔야 하려나?)
+ - [ ] 업데이트 제한기능 추가해야 함. (2분으로 하자)
+ - [ ] 소환사 검색 안될때 그냥 홈으로 돌리지 말고 검색 안된다고 설명 해줘야 할듯. 
  ### 14th Oct. 2021, THU
  - winrate를 서버에서 계산 안해도 되네? 프론트엔드에서 처리하면 되니까. 
+ - 기록 17 부분 deploy를 하기 위해 dev용으로 project를 따로 복사해놨다. 
 
 # algorithm
 1. get username from the user. (search)
@@ -350,9 +366,16 @@ default branch main
     - js undefined vs. null
     - js if false conditions
         - is null, 0, undefined always false? what elses are falses?
+    - tableSort함수 syntax 이해하기. 
+    - prototype-oriented language? 개념 (https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function)
+    - lexical this
 2. promise then / async await
 3. mongoose / mongodb 기본기
     - fields? documents? types? schema?
     - when to use Subdocument
     - how to update subdocument values of a data object
     - and when to use Schema.Types.ObjectId ( how are the two different? )
+4. html dom properties (selectors)
+    - parentNode
+    - children vs. childNodes
+    - querySelector vs. getElementsByTagName

@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "lol stat website using lol api",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "assets": "webpack --config webpack.config.js"
+    "start": "node build/init.js",
+    "build": "npm run build:server && npm run build:assets",
+    "build:server": "babel src -d build",
+    "build:assets": "webpack --mode=production",
+    "dev:server": "nodemon",
+    "dev:assets": "webpack --mode=development -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -18,6 +22,7 @@
   },
   "homepage": "https://github.com/kizarrd/lolapi#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongoose": "^5.13.6",
     "morgan": "^1.10.0",
@@ -26,7 +31,8 @@
     "regenerator-runtime": "^0.13.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.8",
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
     "@babel/node": "^7.14.7",
     "@babel/preset-env": "^7.14.8",
     "babel-loader": "^8.2.2",
@@ -35,7 +41,6 @@
     "nodemon": "^2.0.12",
     "sass": "^1.42.1",
     "sass-loader": "^12.1.0",
-    "style-loader": "^3.3.0",
     "webpack": "^5.58.1",
     "webpack-cli": "^4.9.0"
   }
