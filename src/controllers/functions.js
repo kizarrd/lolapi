@@ -195,11 +195,15 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         if(status){
             console.log("api call error, status: ", status);
             counter++;
+            if(counter>max)
+                break;
             continue;
         }
         // check if this match is a ranked solo queue. if not, continue.
         if(![4, 420].includes(matchObject.info.queueId)){
             counter++;
+            if(counter>max)
+                break;
             continue;
         }
         // 자랭의 경우에 counter가 올라가도록 하지 않으면 max보다 많이 api요청이 발생할 수 있음. 미처 생각못했었네. 
