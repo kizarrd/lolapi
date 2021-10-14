@@ -17,6 +17,7 @@ app.use(morgan('dev'));
 
 app.use("/assets", express.static("assets"));
 app.use("/tiers", express.static("tiers"));
+app.use("/riot", express.static("riot"));
 
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
