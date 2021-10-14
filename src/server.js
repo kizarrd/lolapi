@@ -6,6 +6,7 @@ import apiRouter from "./routers/apiRouter";
 import "./db";
 import "./models/MatchInfo";
 import "regenerator-runtime";
+import path from "path";
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.use(morgan('dev'));
 app.use("/assets", express.static("assets"));
 app.use("/tiers", express.static("tiers"));
 // app.use("/riot", express.static("riot"));
-app.use('/riot.txt', express.static('riot.txt'));
+app.use("/", express.static(path.join(__dirname, '../')));
 
 app.use("/", homeRouter);
 app.use("/summoners", summonerRouter);
