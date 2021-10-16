@@ -216,7 +216,7 @@ default branch main
  - api call error, status:  { message: 'Rate limit exceeded', status_code: 429 }
  - 이런식으로 rate limit exceeded라는 에러가 뜰때가 있다. 계산상으로 2초 대기 후 요청하기 때문에 그럴리가 없는데 랜덤으로 종종 발생하는거 같다. 
     - 내 추측으로는 그냥 api 전체적으로 많은 요청이 발생했을때(나 뿐만 아니라 다른사람들 포함해서) riot api측에서 이런 제어를 하는게 아닌가 싶다. 
-    - 만약 그렇다면 이렇게 누락된 녀석들의 matchId만 모아놨다가 나중에 다시 요청해서 추가하는 기능을 짤 수 있을듯? 
+    - 만약 그렇다면 이렇게 누락된 녀석들의 matchId만 모아서 다시 요청해서 추가하는 기능을 추가해야 할듯?
     - 뿐만 아니라 다른 error와 status_code가 뭐가 있는지 알아봐야겟다. 아니면 status_code도 함께 저장하도록 코드를 만들어서 직접 확인해보는게 좋을수도 있겠고. 
 
  - 괴물쥐쥐의 주요 서비스는 소환사 개인의 전체 챔피언별 상대 전적인데 이
@@ -373,6 +373,14 @@ default branch main
     - tableSort함수 syntax 이해하기. 
     - prototype-oriented language? 개념 (https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function)
     - lexical this
+    - forEach
+        - async await?
+        - continue, break 사용할 수 없음. 
+    - 4가지 for관련 구문 차이점 / 성능비교
+        - for (let i = 0; i < arr.length; ++i)
+        - arr.forEach((v, i) => { /* ... */ })
+        - for (let i in arr)
+        - for (const v of arr)
 2. promise then / async await
 3. mongoose / mongodb 기본기
     - fields? documents? types? schema?

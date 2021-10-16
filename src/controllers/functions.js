@@ -69,7 +69,7 @@ export const getSummonerRankInfo = async (summonerId) => {
     }
     return summonerRankData;
 };
-export const getMatchList = async (puuid, startTime) => {
+export const getMatchList2 = async (numOfMatches, puuid, startTime) => {
     const matchlist = [];
     let counter = 0; // 임시 제한
     let startIndex = 0;
@@ -92,6 +92,33 @@ export const getMatchList = async (puuid, startTime) => {
             break;
     }
     console.log("matchlist length: ", matchlist.length);
+    return matchlist; 
+};
+export const getMatchList = async (numOfMatches, puuid, startTime) => {
+    console.log("startTime: ", startTime);
+    const matchlist = [];
+    let startIndices = [];
+    // const matchlistRequestMax = Math.floor(numOfMatches/100)+1;
+    const matchlistRequestMax = 1;
+    for(let i = 0; i < matchlistRequestMax; i++){
+        startIndices.push(i*100);
+    }
+    try {
+        const matchlistObjectsFetched = await Promise.all(startIndices.map((startIndex) => {
+            // 이 안에 try catch또 해야하나?
+            console.log("startIndex inside Promise.all: ", startIndex);
+            return fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${API_KEY}`);
+        }));
+        const matchlistObjectsJSONed = await Promise.all(matchlistObjectsFetched.map(matchesNotJson => {
+            console.log("doing jsonify");
+            return matchesNotJson.json();
+        }));
+        // matchlistObjectsJSONed.forEach( matches => console.log("matches: ", matches));
+        matchlistObjectsJSONed.forEach( matches => matches.forEach(matchId => matchlist.push(matchId)));
+        console.log("matchlist length: ", matchlist.length);
+    }catch(e){
+        console.log(e.message);
+    }
     return matchlist; 
 };
 const getUserStuffs = (participants, userPuuid) => {
@@ -182,7 +209,7 @@ const sleep = async (millis) => {
     return new Promise(resolve => setTimeout(resolve, millis));
 };
 
-export const updateChampionRecords = async (user_db, matchlist) => {
+export const updateChampionRecords2 = async (user_db, matchlist) => {
     let counter = 0;
     const max = 4;
     for(const matchId of matchlist){
@@ -292,6 +319,119 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         if(counter>max)
             break;
     }
+    await processWinratesAllSeasons(user_db);
+    await updateMostEncountered(user_db);
+    // await user_db.save();
+};
+
+export const updateChampionRecords = async (user_db, matchlist) => {
+    let counter = 0;
+    const max = 10;
+    // matchlist에 있는 match들을 모두 한번에 fetch하면 rate limit초과하기 때문에 일단 임시로 앞에 다섯개만 가져와서 처리해보려고 함.
+    const temporary_matchlist = []
+    for(let i = 0; i < max; i++){
+        temporary_matchlist.push(matchlist[i]);
+    }
+
+    // promise.all방식으로 한번에 모든 matchlists fetch 한다음
+    // 그렇게 fetch된 matchlist들을 또 한번에 json화 해줌. 
+    const matchObjectsFetched = await Promise.all(temporary_matchlist.map( matchId => {
+        console.log("fetching ", matchId);
+        return fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${API_KEY}`);
+    }))
+    const matchObjectsJSONed = await Promise.all(matchObjectsFetched.map( matchFetched => {
+        return matchFetched.json();
+    }));
+
+    for(const matchObject of matchObjectsJSONed){
+        const { status } = matchObject;
+        // if there is an error with the api call, print status and continue to the next match
+        if(status){
+            console.log("api call error, status: ", status);
+            continue;
+        }
+        // check if this match is a ranked solo queue. if not, continue.
+        if(![4, 420].includes(matchObject.info.queueId)){
+            continue;
+        }
+        // check match start time so that we can determine which championrecords season this match should be classified into.
+        // 1610046000 = 한국시간 2021년 1월 8일 오전 4시
+        let championRecords_key;
+        const baseStr = 'championRecords';
+        const season11StartTime = 1610046000;
+        if(matchObject.info.gameStartTimestamp >= season11StartTime){
+            championRecords_key = baseStr+'11';
+        }else{
+            championRecords_key = baseStr+'Before';
+        }
+        const playersAtThisMatch = matchObject.info.participants;
+        const { userChampionName, userTeamId, userWin }= getUserStuffs(playersAtThisMatch, user_db.puuid);
+        console.log(`userTeamId: ${userTeamId}, userWin: ${userWin}`);
+        const userChampionId = championId_by_championName[userChampionName];
+        // 라이엇 api안내에서 match v5의 info.participant.championId 가 부정확한 경우가 있기 때문에 챔피언을 구분하기 위해서 championName을 쓰라고 권고하고 있음. 실제로 부정확한 경우를 내가 확인했음. 예를들어 KR_4960757039같은 경우. 첫번째 participant의 championId가 championId: 37225015라고 되어 있음. 하지만 내 앱에서는 id가 필요하기 때문에 championName을 가져와서 정확한 id로 convert하는 방법을 쓰기로 함. 
+        // if the championrecord of the champion played by the user in this match does not exist in the user db instance, make one
+        if(!user_db[championRecords_key].has(userChampionId.toString())){
+            const a_championRecord = new ChampionRecord({
+                championId: userChampionId,
+                numOfGamesPlayed: 0,
+                wins: 0,
+                winRate: 0,
+                encounteredChampionsList: {},
+                mostPlayedWith: '',
+                mostPlayedAgainst: '',
+                mostEncountered: ''
+            });
+            await a_championRecord.save();
+            user_db[championRecords_key].set(userChampionId.toString(), a_championRecord._id);
+            await user_db.save();
+        }
+
+        // update wins and numOfGamesPlayed of the champion played by the user at this match
+        const championRecord_objectId = user_db[championRecords_key].get(userChampionId.toString());
+        await ChampionRecord.findByIdAndUpdate(championRecord_objectId, {
+            $inc: { numOfGamesPlayed: 1, wins: (userWin ? 1 : 0) }
+        });
+        // by going through the champions played by other playersAtThisMatch at this match, update the encounteredChampionsList of the championRecord of the champion played by the user at this match.
+        const a_championRecord = await ChampionRecord.findById(championRecord_objectId);
+        for(const player of playersAtThisMatch){
+            // if the player is the user, skip it
+            if(player.puuid == user_db.puuid)
+                continue;
+            // if the there is no encountered record for this champion in the encounteredChampionsList, create a new encounteredChampion object and add it to the list
+            const champId_playedByPlayer = championId_by_championName[player.championName];
+            if(!a_championRecord.encounteredChampionsList.has(champId_playedByPlayer.toString())){
+                // console.log(`champion ${userChampionName} has encountered champion ${player.championName} for the first time!`);
+                a_championRecord.encounteredChampionsList.set(champId_playedByPlayer.toString(), {
+                    id: champId_playedByPlayer,
+                    playedAgainst: 0,
+                    playedWith: 0,
+                    winAgainst: 0,
+                    winWith: 0,
+                    winRateAgainst: 0,
+                    winRateWith: 0
+                })
+                // console.log("championRecord after the first encounter: ", a_championRecord);
+            }
+
+            // await ChampionRecord.findByIdAndUpdate(championRecord_objectId, {
+            //     $inc: { encounteredChampionsList: }
+            // });
+
+            if(player.teamId == userTeamId){
+                a_championRecord.encounteredChampionsList.get(champId_playedByPlayer.toString()).playedWith += 1;
+                if(userWin){
+                    a_championRecord.encounteredChampionsList.get(champId_playedByPlayer.toString()).winWith += 1;
+                }
+            }else{
+                a_championRecord.encounteredChampionsList.get(champId_playedByPlayer.toString()).playedAgainst += 1;
+                if(userWin){
+                    a_championRecord.encounteredChampionsList.get(champId_playedByPlayer.toString()).winAgainst += 1;
+                }
+            }
+        }
+        await a_championRecord.save();
+    }
+    
     await processWinratesAllSeasons(user_db);
     await updateMostEncountered(user_db);
     // await user_db.save();
