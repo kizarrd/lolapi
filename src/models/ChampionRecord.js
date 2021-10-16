@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const championRecordSchema = new mongoose.Schema({
     championId: Number,
+    season: String,
     numOfGamesPlayed: Number,
     wins: Number,
     winRate: Number,
