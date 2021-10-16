@@ -4,7 +4,6 @@ import homeRouter from "./routers/homeRouter";
 import summonerRouter from "./routers/summonerRouter";
 import apiRouter from "./routers/apiRouter";
 import "./db";
-import "./models/MatchInfo";
 import "regenerator-runtime";
 import path from "path";
 
