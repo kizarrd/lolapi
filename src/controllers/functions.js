@@ -209,7 +209,7 @@ const sleep = async (millis) => {
     return new Promise(resolve => setTimeout(resolve, millis));
 };
 
-export const updateChampionRecords = async (user_db, matchlist) => {
+export const updateChampionRecords2 = async (user_db, matchlist) => {
     let counter = 0;
     const max = 4;
     for(const matchId of matchlist){
@@ -324,7 +324,7 @@ export const updateChampionRecords = async (user_db, matchlist) => {
     // await user_db.save();
 };
 
-export const updateChampionRecords2 = async (user_db, matchlist) => {
+export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
     const max = 5;
     // matchlist에 있는 match들을 모두 한번에 fetch하면 rate limit초과하기 때문에 일단 임시로 앞에 다섯개만 가져와서 처리해보려고 함.
@@ -424,7 +424,7 @@ export const updateChampionRecords2 = async (user_db, matchlist) => {
     }
     // console.log("championRecords_server: ", championRecords_server);
     console.log("mock championrecords(server) done");
-    console.log("championRecords_server.length: ", championRecords_server.length);
+    console.log("championRecords_server.length: ", Array.from(championRecords_server).length);
     // get and create championRecords
     const championRecords_db = await Promise.all(Array.from(championRecords_server.keys()).map( key => {
         const strs = key.split('_');
@@ -457,14 +457,62 @@ export const updateChampionRecords2 = async (user_db, matchlist) => {
     await user_db.save();
     console.log("new championRecords are registered to User and saved.");
     // update championRecords, including encounteredChampionsList
-    // await Promise.all(championRecords_db.map(championRecord_db => {
+    championRecords_db.forEach(championRecord_db => {
+        const according_champRecord_server = championRecords_server.get(championRecord_db.championId.toString()+'_'+championRecord_db.season);
+        championRecord_db.numOfGamesPlayed += according_champRecord_server.numOfGamesPlayed;
+        championRecord_db.wins += according_champRecord_server.wins;
+        championRecord_db.winRate = championRecord_db.wins/championRecord_db.numOfGamesPlayed;
+        let maxPlayedWith = 0;
+        let maxPlayedAgainst = 0;
+        let maxEncountered = 0;
+        let mostWith_id = '';
+        let mostAgainst_id = '';
+        let mostEncountered_id = '';
+        for(const [encChampid, encChampObj] of according_champRecord_server.encounteredChampionsList){
+            const plyd_wth = encChampObj.playedWith;
+            const plyd_agnst = encChampObj.playedAgainst;
+            const total_encntrd = plyd_wth + plyd_agnst;
+            if(plyd_wth > maxPlayedWith){
+                maxPlayedWith = plyd_wth;
+                mostWith_id = encChampid;
+            }
+            if(plyd_agnst > maxPlayedAgainst){
+                maxPlayedAgainst = plyd_agnst;
+                mostAgainst_id = encChampid
+            }
+            if(total_encntrd > maxEncountered){
+                maxEncountered = total_encntrd;
+                mostEncountered_id = encChampid;
+            }
 
-    // }));
-
-
-    await processWinratesAllSeasons(user_db);
-    console.log("update process winrates all seasons done");
-    await updateMostEncountered(user_db);
-    console.log("update most encountered done");
-    // await user_db.save();
+            if(!championRecord_db.encounteredChampionsList.has(encChampid)){
+                championRecord_db.encounteredChampionsList.set(encChampid, {
+                    id: encChampObj.id,
+                    playedAgainst: 0,
+                    playedWith: 0,
+                    winAgainst: 0,
+                    winWith:0,
+                    winRateAgainst:0,
+                    winRateWith:0
+                })
+            }
+            const encChampObj_db = championRecord_db.encounteredChampionsList.get(encChampid);
+            encChampObj_db.playedAgainst += encChampObj.playedAgainst;
+            encChampObj_db.playedWith += encChampObj.playedWith;
+            encChampObj_db.winAgainst += encChampObj.winAgainst;
+            encChampObj_db.winWith += encChampObj.winWith;
+            encChampObj_db.winRateAgainst = encChampObj_db.playedAgainst>0 ? encChampObj_db.winAgainst/encChampObj_db.playedAgainst : 0;
+            encChampObj_db.winRateWith = encChampObj_db.playedWith>0 ? encChampObj_db.winWith/encChampObj_db.playedWith : 0;
+        }
+        championRecord_db.mostPlayedWith = mostWith_id;
+        championRecord_db.mostPlayedAgainst = mostAgainst_id;
+        championRecord_db.mostEncountered = mostEncountered_id;
+    });
+    console.log("championRecords_db[0] numofGamePlayed and etc. ", championRecords_db[0]);
+    console.log("championRecords_db[0].encounteredChampionsList", championRecords_db[0].encounteredChampionsList);
+    // save all championRecords updated
+    await Promise.all(championRecords_db.map(championRecord_db => {
+        console.log("saving after encounteredList update:", championRecord_db.season, championRecord_db.championId);
+        championRecord_db.save();
+    }));
 };
