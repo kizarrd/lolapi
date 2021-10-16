@@ -276,6 +276,12 @@ default branch main
  - heroku cli 설치된 상황에서  heroku logs --app=monstergg 이런식으로 터미널에서 명령어를 통해 내 앱에 대해 로그를 확인할 수 있다는 것을 알게됨. (heroku git 안쓰고 github connect하더라도 사용 가능)
     - 그리고 뒤에 --tail 붙여주면 실시간으로 서버로그 확인 가능.
 
+ ### 16th Oct. 2021, SAT
+ - Promise.all을 사용함으로서 api응답속도(fetching)는 확실히 빨라진듯. 
+ - 서버 로그로 봤을때 그다음 속도 지연의 큰 원인은 db처리속도 인듯. db요청 횟수를 줄여야 할듯. 루프 안에 db요청을 하지말고 모아서 한번만 처리하는 방향으로 해야함. 그럼 서버의 계산 처리부담이 커질거 같긴 함
+    - 내 컴퓨터에서 돌려봤을때랑 비교했을때 db를 포함한 루프 진행 속도가 큰 차이가 남. 
+ - 또하나의 속도 저하의 원인은 서버 자체의 응답속도. 헤로쿠 서버가 미국에 있다는데 aws를 써보는 것을 고려해봐야 할듯. db보다는 적은 영향인것처럼 보임. 
+
 # algorithm
 1. get username from the user. (search)
 2. get encrypted accountId

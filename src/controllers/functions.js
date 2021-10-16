@@ -326,7 +326,7 @@ export const updateChampionRecords2 = async (user_db, matchlist) => {
 
 export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
-    const max = 10;
+    const max = 5;
     // matchlist에 있는 match들을 모두 한번에 fetch하면 rate limit초과하기 때문에 일단 임시로 앞에 다섯개만 가져와서 처리해보려고 함.
     const temporary_matchlist = []
     for(let i = 0; i < max; i++){
