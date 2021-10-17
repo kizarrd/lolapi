@@ -49,7 +49,7 @@ export const summoner = async (req, res) => {
         const matchlist = await getMatchList((summonerRankInfo.soloWins+summonerRankInfo.soloLosses),puuid, 0);
         // console.log("last match id: ", matchlist[0]);
         try{
-            const user = new User({
+            const user = await User.create({
                 userName: name,
                 summonerId,
                 encryptedAccountId: accountId,
@@ -66,7 +66,6 @@ export const summoner = async (req, res) => {
                 championRecords11: {},
                 championRecords12: {}
             })
-            await user.save();
             await updateChampionRecords(user, matchlist);
         }catch(error){
             console.log(error);

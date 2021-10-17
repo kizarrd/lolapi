@@ -508,11 +508,12 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         championRecord_db.mostPlayedAgainst = mostAgainst_id;
         championRecord_db.mostEncountered = mostEncountered_id;
     });
-    console.log("championRecords_db[0] numofGamePlayed and etc. ", championRecords_db[0]);
-    console.log("championRecords_db[0].encounteredChampionsList", championRecords_db[0].encounteredChampionsList);
+    // console.log("championRecords_db[0] numofGamePlayed and etc. ", championRecords_db[0]);
+    // console.log("championRecords_db[0].encounteredChampionsList", championRecords_db[0].encounteredChampionsList);
     // save all championRecords updated
     await Promise.all(championRecords_db.map(championRecord_db => {
         console.log("saving after encounteredList update:", championRecord_db.season, championRecord_db.championId);
         championRecord_db.save();
     }));
+    console.log("saved.");
 };
