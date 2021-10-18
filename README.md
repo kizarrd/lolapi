@@ -255,8 +255,8 @@ default branch main
     - pug에서 피들스틱인 경우 예외처리 함.
  - [x] 배포(deploy)
     - 배포하기 전에 기능에 대해 좀더 안내 가이드? 같은것을 사이트 내에 표시해야 하는지 생각해 봐야겠음.
-    - [ ] deploy했는데 너무너무 느림. updatechampionrecords할때 matchdata를 count해서 db저장은 한번만 하도록 하면 속도가 많이 개선될 수 있을까? (db update과정을 loop에서 빼고 마지막에 한번만 하도록)
- - [ ] 라이엇에 production key요청
+    - [x] deploy했는데 너무너무 느림. updatechampionrecords할때 matchdata를 count해서 db저장은 한번만 하도록 하면 속도가 많이 개선될 수 있을까? (db update과정을 loop에서 빼고 마지막에 한번만 하도록)
+ - [x] 라이엇에 production key요청
     - [ ] 프로덕션 키 받고 나면 처리시간 얼마나 걸리는지 확인하고 만약 여전히 오래걸린다면 로딩 방식/화면 고민좀 해봐야 겠음. 예를들어 일단 소환사프로필만 먼저 띄워주고 chapmionrecords는 로딩완료되면 그때 띄워준다던가. 
  - [ ] winrate을 서버/db에서 계산/저장하지 않고 프론트엔드 js에서 할지 고민.
     - 유의미한 시간차이 / 서버 계산처리량 차이 / db저장용량 차이 가 있을까??
@@ -277,10 +277,27 @@ default branch main
     - 그리고 뒤에 --tail 붙여주면 실시간으로 서버로그 확인 가능.
 
  ### 16th Oct. 2021, SAT
+ - https://blog.uniony.me/lol/game-duration/ 블로그에서 중요한 힌트를 얻었다. api와 db호출을 루프로 순차적으로 하는 대신에 한번에 할 수 있다고 한다. 그러면 당연히 처리속도가 매우 빨라질듯. 
+ - 검색해본결과 Promise.all에 대해 알게 되었다. https://www.youtube.com/watch?v=xWRp1K8ga9s
  - Promise.all을 사용함으로서 api응답속도(fetching)는 확실히 빨라진듯. 
  - 서버 로그로 봤을때 그다음 속도 지연의 큰 원인은 db처리속도 인듯. db요청 횟수를 줄여야 할듯. 루프 안에 db요청을 하지말고 모아서 한번만 처리하는 방향으로 해야함. 그럼 서버의 계산 처리부담이 커질거 같긴 함
     - 내 컴퓨터에서 돌려봤을때랑 비교했을때 db를 포함한 루프 진행 속도가 큰 차이가 남. 
  - 또하나의 속도 저하의 원인은 서버 자체의 응답속도. 헤로쿠 서버가 미국에 있다는데 aws를 써보는 것을 고려해봐야 할듯. db보다는 적은 영향인것처럼 보임. 
+
+ ### 17th Oct. 2021, SUN
+ - db도 역시 promise.all 사용해서 한번에 전부 요청하는 식으로 처리했음. 속도 유의미하게 빨라진듯. 
+ - 또 db를 us east region으로 옮겨봤는데 효과가 있는거 같음. 헤로쿠 서버가 미국에 있기 때문에 서버와 db가 가까운 것이 사이트의 전체 응답속도를 줄이는데 효과가 있는거 같다. 이게 실제로 효과가 있다는게 신기하다. 
+ - api fetch promise.all, db 통신 promise.all, 그리고 db물리적 위치 변경(서버와 가깝도록)
+    - ==> 이 세가지를 통해 12초?정도 걸리던 속도를(5경기 처리하는데만 그랬고 만약 기존 방식으로 수백경기를 처리한다면 경기수에 비례해서 더 시간이 걸렸을 것) 3초대로 줄였다. 
+    - server log에 service=에 표시된 숫자를 기준으로 말하는거긴 한데 실제로 시간 재보면 그거보다는 조금 더걸리는거 같다.  
+ - 그래도 여전히 더 빨랐으면 좋겠는데 더 생각해볼 수 있는 방법은..
+    - getSummonerRankInfo 없이 getMatchlist를 할 수 있다면 주요 api fetch지연요소 한가지를 해결할 수 있지 않을까 싶음. 근데 그게 쉽지는 않을듯 promise.all하려면 총 몇경기인지를 알아야 되는데 현재는 그걸 getSummonerRankInfo를 통해 근사값을 구하는 방식으로 해결하고 있기 때문에. 몇경기인지 모르고 promise.all을 할수가 있나? 
+    - 서버와 db를 둘다 한국 가까이로 옮기는게 아마 속도를 크게 올릴 수 있지 않을까 싶은데. aws서버 deploy에 대해 알아봐야 할거 같다. 
+    - 일단 콘솔로깅 해서 정확히 어느 부분에서 시간이 가장 걸리고 줄일 수 있을거 같은지 분석해보자. 
+    - 또한가지 api서버가 어디 있는지도 영향이 있을거 같긴한데 디스코드에 검색해본 결과 
+        - "Are the APIs servers physically located in their relative regions? euw1 in EU, na1 in US, kr in Korea etc... because i noticed that requesting from EU to na1 or kr takes longer than requesting to euw1"
+        - "Yes to some extent. The API edge proxies live in 3 regions (americas, europe and asia) and when you request data from a league region, it's taken care of by the closest proxy" 
+        - 라고 한다. 그럼 미국에 있는 서버에서 kr api요청을 하면 손해라는건가??
 
 # algorithm
 1. get username from the user. (search)

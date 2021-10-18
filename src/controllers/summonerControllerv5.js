@@ -71,7 +71,6 @@ export const summoner = async (req, res) => {
             console.log(error);
             return res.send(`error: ${error}`);
         }
-        
     }
     // find the user from our db and pass it over to render method.
     const user_db = await User.findOne({ userName: name }).populate("championRecordsBefore").populate("championRecords11").populate("championRecords12"); // 이것도 아마 production key받으면 puuid로 해야할듯? 
