@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
 import { championId_by_championName } from "./champion_processed";
 
-const API_KEY = "RGAPI-e4f18b86-9271-4cb4-ae9f-422fc141cd1a";
+const API_KEY = "RGAPI-58ac60ab-10ba-4be5-9770-2539c0c6cc26";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
 const API_ROOT_ASIA = "https://asia.api.riotgames.com/lol/";
 const MATCH_BY_MATCHID = "match/v5/matches/";
@@ -328,9 +328,15 @@ export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
     const max = 5;
     // matchlist에 있는 match들을 모두 한번에 fetch하면 rate limit초과하기 때문에 일단 임시로 앞에 다섯개만 가져와서 처리해보려고 함.
-    const temporary_matchlist = []
-    for(let i = 0; i < max; i++){
+    const temporary_matchlist = [];
+    for(let i = 0; i < matchlist.length; i++){
         temporary_matchlist.push(matchlist[i]);
+
+
+        counter++
+        if(counter == max){
+            break;
+        }
     }
 
     // promise.all방식으로 한번에 모든 matchlists fetch 한다음
