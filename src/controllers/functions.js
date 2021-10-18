@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
 import { championId_by_championName } from "./champion_processed";
 
-const API_KEY = "RGAPI-58ac60ab-10ba-4be5-9770-2539c0c6cc26";
+const API_KEY = "RGAPI-946c0155-cec9-4575-b06b-a6d4eaa02fc2";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
 const API_ROOT_ASIA = "https://asia.api.riotgames.com/lol/";
 const MATCH_BY_MATCHID = "match/v5/matches/";
