@@ -3,6 +3,8 @@ import fetch from "node-fetch";
 import ChampionRecord from "../models/ChampionRecord";
 import { championId_by_championName } from "./champion_processed";
 
+var ObjectId = require('mongoose').Types.ObjectId; 
+
 const API_KEY = "RGAPI-a730ef94-1660-43fc-b9bd-96dda3386c9e";
 const API_ROOT = "https://kr.api.riotgames.com/lol/";
 const API_ROOT_ASIA = "https://asia.api.riotgames.com/lol/";
@@ -13,11 +15,11 @@ const RANK_INFO_BY_SUMMONERID = "league/v4/entries/by-summoner/";
 
 export const getSummonerProfile = async (summonerName) => {
     const encodedSummonerName = qs.escape(summonerName)
-    const summonerProfile = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+encodedSummonerName}?api_key=${API_KEY}`)).json();
+    const summonerProfile = await (await fetch(`${API_ROOT+SUMMONERS_BY_NAME+encodedSummonerName}?api_key=${process.env.PR_API_KEY}`)).json();
     return summonerProfile;
 };
 export const getSummonerRankInfo = async (summonerId) => {
-    const summonerRankDataList = await (await fetch(`${API_ROOT+RANK_INFO_BY_SUMMONERID+summonerId}?api_key=${API_KEY}`)).json();
+    const summonerRankDataList = await (await fetch(`${API_ROOT+RANK_INFO_BY_SUMMONERID+summonerId}?api_key=${process.env.PR_API_KEY}`)).json();
     let summonerRankData = {
         soloTier: 0,
         soloRank: 0,
@@ -76,7 +78,7 @@ export const getMatchList2 = async (numOfMatches, puuid, startTime) => {
     console.log("startTime: ", startTime);
     while(true){
         // await sleep(2000);
-        const matches = await( await fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${API_KEY}`)).json();
+        const matches = await( await fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${process.env.PR_API_KEY}`)).json();
         console.log("matches", matches);
         // [KR_5478478, ... ] 형식의 matchlist array임. 
         if(matches.length == 0)
@@ -107,7 +109,7 @@ export const getMatchList = async (numOfMatches, puuid, startTime) => {
         const matchlistObjectsFetched = await Promise.all(startIndices.map((startIndex) => {
             // 이 안에 try catch또 해야하나?
             console.log("startIndex inside Promise.all: ", startIndex);
-            return fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${API_KEY}`);
+            return fetch(`${API_ROOT_ASIA+MATCHES_BY_PUUID+puuid}/ids?startTime=${startTime}&start=${startIndex}&count=100&api_key=${process.env.PR_API_KEY}`);
         }));
         const matchlistObjectsJSONed = await Promise.all(matchlistObjectsFetched.map(matchesNotJson => {
             console.log("doing jsonify");
@@ -133,6 +135,7 @@ const getUserStuffs = (participants, userPuuid) => {
 const processWinratesAllSeasons = async (user_db) => {
     for(const champRecordId of user_db.championRecords11.values()){
         const champRecord = await ChampionRecord.findById(champRecordId);
+        console.log("processwinrates: ", champRecordId);
         champRecord.winRate = champRecord.wins / champRecord.numOfGamesPlayed;
         for(const encounteredChamp of champRecord.encounteredChampionsList.values()){
             if(encounteredChamp.playedWith>0){
@@ -215,7 +218,7 @@ export const updateChampionRecords2 = async (user_db, matchlist) => {
     for(const matchId of matchlist){
         // await sleep(1500);
         console.log("processing match #", counter);
-        const matchObject = await (await fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${API_KEY}`)).json();
+        const matchObject = await (await fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${process.env.PR_API_KEY}`)).json();
         console.log("api match called, matchId: ", matchId);
         // if there is an error with the api call, print status and continue to the next match
         const { status } = matchObject;
@@ -332,7 +335,6 @@ export const updateChampionRecords = async (user_db, matchlist) => {
     for(let i = 0; i < matchlist.length; i++){
         temporary_matchlist.push(matchlist[i]);
 
-
         counter++
         if(counter == max){
             break;
@@ -343,7 +345,7 @@ export const updateChampionRecords = async (user_db, matchlist) => {
     // 그렇게 fetch된 matchlist들을 또 한번에 json화 해줌. 
     const matchObjectsFetched = await Promise.all(temporary_matchlist.map( matchId => {
         console.log("fetching ", matchId);
-        return fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${API_KEY}`);
+        return fetch(`${API_ROOT_ASIA+MATCH_BY_MATCHID+matchId}?api_key=${process.env.PR_API_KEY}`);
     }))
     const matchObjectsJSONed = await Promise.all(matchObjectsFetched.map( matchFetched => {
         return matchFetched.json();
@@ -436,7 +438,10 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         const strs = key.split('_');
         if(user_db[strs[1]].has(strs[0])){
             console.log("just returning existing champRecord");
-            return ChampionRecord.findById(strs[0]);
+            console.log("season: ", strs[1]);
+            console.log("kdljfalkjf: ", typeof(user_db[strs[1]].get(strs[0])._id) );
+            console.log("kdljfalkjf: ", user_db[strs[1]].get(strs[0])._id );
+            return ChampionRecord.findOne({"_id": user_db[strs[1]].get(strs[0])._id });
         }else{
             console.log("creating new champRecord");
             return ChampionRecord.create({
@@ -452,11 +457,13 @@ export const updateChampionRecords = async (user_db, matchlist) => {
             });
         }
     }));
-    console.log("championRecords_db[0]: ", championRecords_db[0]);
+    console.log("championRecords_db[1]: ", championRecords_db[1]);
     console.log("championRecords_db.length: ", championRecords_db.length);
     // register championRecords objectIds to the User
     championRecords_db.forEach(championRecord_db => {
         if(!user_db[championRecord_db.season].has(championRecord_db.championId.toString())){
+            console.log("dfkjdjlkfdljk: ", championRecord_db._id);
+            console.log("dfkjdjlkfdljk: ", championRecord_db.championId);
             user_db[championRecord_db.season].set(championRecord_db.championId.toString(), championRecord_db._id)
         }
     });
