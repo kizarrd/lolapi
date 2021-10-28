@@ -438,10 +438,7 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         const strs = key.split('_');
         if(user_db[strs[1]].has(strs[0])){
             console.log("just returning existing champRecord");
-            console.log("season: ", strs[1]);
-            console.log("kdljfalkjf: ", typeof(user_db[strs[1]].get(strs[0])._id) );
-            console.log("kdljfalkjf: ", user_db[strs[1]].get(strs[0])._id );
-            return ChampionRecord.findOne({"_id": user_db[strs[1]].get(strs[0])._id });
+            return ChampionRecord.findById(user_db[strs[1]].get(strs[0])._id);
         }else{
             console.log("creating new champRecord");
             return ChampionRecord.create({
@@ -457,13 +454,15 @@ export const updateChampionRecords = async (user_db, matchlist) => {
             });
         }
     }));
-    console.log("championRecords_db[1]: ", championRecords_db[1]);
     console.log("championRecords_db.length: ", championRecords_db.length);
     // register championRecords objectIds to the User
+    console.log("user_db1: ", user_db)
     championRecords_db.forEach(championRecord_db => {
+        console.log("user_db2: ", user_db)
         if(!user_db[championRecord_db.season].has(championRecord_db.championId.toString())){
             console.log("dfkjdjlkfdljk: ", championRecord_db._id);
             console.log("dfkjdjlkfdljk: ", championRecord_db.championId);
+            console.log("dkfjkdj: ", user_db[championRecord_db.season]);
             user_db[championRecord_db.season].set(championRecord_db.championId.toString(), championRecord_db._id)
         }
     });
