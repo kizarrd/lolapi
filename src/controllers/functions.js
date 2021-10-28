@@ -105,6 +105,9 @@ export const getMatchList = async (numOfMatches, puuid, startTime) => {
     for(let i = 0; i < matchlistRequestMax; i++){
         startIndices.push(i*100);
     }
+
+    // startIndices = [ 100 ];
+
     try {
         const matchlistObjectsFetched = await Promise.all(startIndices.map((startIndex) => {
             // 이 안에 try catch또 해야하나?
@@ -438,7 +441,7 @@ export const updateChampionRecords = async (user_db, matchlist) => {
         const strs = key.split('_');
         if(user_db[strs[1]].has(strs[0])){
             console.log("just returning existing champRecord");
-            return ChampionRecord.findById(user_db[strs[1]].get(strs[0])._id);
+            return ChampionRecord.findById(user_db[strs[1]].get(strs[0]));
         }else{
             console.log("creating new champRecord");
             return ChampionRecord.create({

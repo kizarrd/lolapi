@@ -73,7 +73,8 @@ export const summoner = async (req, res) => {
         }
     }
     // find the user from our db and pass it over to render method.
-    const user_db = await User.findOne({ userName: name }).populate("championRecordsBefore").populate("championRecords11").populate("championRecords12"); // 이것도 아마 production key받으면 puuid로 해야할듯? 
+    const user_db = await User.findOne({ userName: name }).populate("championRecordsBefore").populate("championRecords11").populate("championRecords12"); // 이것도 아마 production key받으면 puuid로 해야할듯? (닉변할 수 있으니)
+    // const user_db = await User.findOne({ userName: name });// 이것도 아마 production key받으면 puuid로 해야할듯? (닉변할 수 있으니)
     // console.log("ohojokadj: ", user_db[`championRecords${11}`]);
     // const champion_records = user_db.championRecords11;
     const champion_records_sorted = [];
@@ -112,7 +113,8 @@ export const update = async (req, res) => {
     const summonerRankInfo = await getSummonerRankInfo(summonerId);
     console.log("soloRankTier: ", summonerRankInfo.soloTier);
     // get matchlist
-    const user_db = await User.findOne({ userName: name }).populate("championRecords11").populate("championRecordsBefore").populate("championRecords12");
+    // const user_db = await User.findOne({ userName: name }).populate("championRecords11").populate("championRecordsBefore").populate("championRecords12");
+    const user_db = await User.findOne({ userName: name });
     // const user_db = await User.findOne({ puuid: puuid });
     // 이거 이렇게 puuid로 바꾸어야 할듯. 닉변한경우 검색하려면 puuid로 해야함 이게 summoner의 고유값이기 때문에 하지만 지금은 product key가없기 때문에 아마 api key를 새로 받을때마다 puuid가 달라질 것임. 그래서 일단 username으로 가자. 앱의 다른 부분에도 username을 쓴 부분이 있을텐데 한번 잘 살펴봐야겠다. 1633696584236
     const matchlist = await getMatchList((summonerRankInfo.soloWins+summonerRankInfo.soloLosses), puuid, Math.ceil(user_db.lastUpdateTime/1000));
