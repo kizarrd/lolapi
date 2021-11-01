@@ -101,7 +101,7 @@ export const getMatchList = async (numOfMatches, puuid, startTime) => {
     const matchlist = [];
     let startIndices = [];
     // const matchlistRequestMax = Math.floor(numOfMatches/100)+1;
-    const matchlistRequestMax = 1;
+    const matchlistRequestMax = 5;
     for(let i = 0; i < matchlistRequestMax; i++){
         startIndices.push(i*100);
     }
@@ -332,7 +332,7 @@ export const updateChampionRecords2 = async (user_db, matchlist) => {
 
 export const updateChampionRecords = async (user_db, matchlist) => {
     let counter = 0;
-    const max = 5;
+    const max = 450;
     // matchlist에 있는 match들을 모두 한번에 fetch하면 rate limit초과하기 때문에 일단 임시로 앞에 다섯개만 가져와서 처리해보려고 함.
     const temporary_matchlist = [];
     for(let i = 0; i < matchlist.length; i++){
@@ -459,13 +459,11 @@ export const updateChampionRecords = async (user_db, matchlist) => {
     }));
     console.log("championRecords_db.length: ", championRecords_db.length);
     // register championRecords objectIds to the User
-    console.log("user_db1: ", user_db)
     championRecords_db.forEach(championRecord_db => {
-        console.log("user_db2: ", user_db)
         if(!user_db[championRecord_db.season].has(championRecord_db.championId.toString())){
-            console.log("dfkjdjlkfdljk: ", championRecord_db._id);
-            console.log("dfkjdjlkfdljk: ", championRecord_db.championId);
-            console.log("dkfjkdj: ", user_db[championRecord_db.season]);
+            // console.log("championRecord_db._id: ", championRecord_db._id);
+            console.log("championRecord_db.championId: ", championRecord_db.championId);
+            console.log("user_db[championRecord_db.season].size: ", user_db[championRecord_db.season].size);
             user_db[championRecord_db.season].set(championRecord_db.championId.toString(), championRecord_db._id)
         }
     });
